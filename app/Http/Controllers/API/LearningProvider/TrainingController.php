@@ -96,6 +96,7 @@ class TrainingController extends Controller
     {
         try {
             $trainings = DB::select('SELECT * FROM l_p_trainings WHERE status=1');
+            $res['list'] = [];
             foreach ($trainings as $training) {
                 $res['list'][] = [
                     "name" => $training->name,
