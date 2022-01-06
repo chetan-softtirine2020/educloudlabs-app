@@ -9,11 +9,12 @@ use App\Models\Role;
 use App\Models\LPTUser;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithValidation;
 use Illuminate\Support\Facades\Mail;
 use App\Models\LPTraining;
 use App\Mail\AddTrainingMail;
 use Illuminate\Support\Facades\Validator;
-class UsersImport implements ToCollection, WithHeadingRow
+class UsersImport implements ToCollection,WithValidation, WithHeadingRow
 {
     public function __construct($traning_id)
     {
@@ -30,8 +31,8 @@ class UsersImport implements ToCollection, WithHeadingRow
         Validator::make($rows->toArray(), [
             '*.first_name' => 'required',
             '*.last_name' => 'required',
-            '*.mobile_no' => 'required',
-            '*.email' => 'required',          
+            '*.mobile_no' => 'required|unique:users,mobile_no',
+            '*.email' => 'required|unique:users,email',          
         ])->validate();
      
         foreach ($rows as $row) {
@@ -57,6 +58,16 @@ class UsersImport implements ToCollection, WithHeadingRow
             $training = LPTraining::where('id', $this->training_id)->first();
             Mail::to($row['email'])->send(new AddTrainingMail($training));
         }
+    }
+
+    public function rules(): array
+    {
+        return [
+            '*.first_name' => 'required',
+            '*.last_name' => 'required',
+            '*.mobile_no' => 'required|unique:users,mobile_no',
+            '*.email' => 'required|unique:users,email',          
+        ];
     }
   
 }

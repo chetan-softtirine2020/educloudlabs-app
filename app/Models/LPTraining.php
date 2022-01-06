@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class LPTraining extends Model
+use App\Models\BaseModel; 
+class LPTraining extends BaseModel
 {
     //
 }

@@ -34,14 +34,17 @@ class AuthController extends BaseController
         try {
             $user = new User();
             $user->first_name = $request->first_name;
-            $user->last_name = $request->last_name;        
-            $user->slug = User::userSlug($request->first_name,$request->last_name);
+            $user->last_name = $request->last_name;
+            $user->slug = User::userSlug($request->first_name, $request->last_name);
             $user->email = $request->email;
             $user->mobile_no = $request->mobile_no;
             $user->password = bcrypt($request->password);
             $user->role = $request->user_type;
             if ($request->user_type == Role::LEARNING_PROVIDER || $request->user_type == Role::ORGANIZATION) {
                 $user->is_parent = 1;
+            }
+            if ($request->type == 6) {
+                $user->is_parent = $request->org_id;
             }
             $user->save();
             switch ($request->user_type) {
@@ -53,6 +56,12 @@ class AuthController extends BaseController
                     break;
                 case Role::ORGANIZATION:
                     $role = "organization";
+                    break;
+                case Role::PROVIDER_USER:
+                    $role = "provider_user";
+                    break;
+                case Role::ORG_USER:
+                    $role = "organization_user";
                     break;
                 default:
                     $role = "admin";

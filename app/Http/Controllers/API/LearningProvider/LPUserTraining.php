@@ -29,7 +29,7 @@ class LPUserTraining extends Controller
             'last_name' => 'required',
             'email' => 'required|email',
             'mobile_no' => 'required',
-            'training_id' => 'required'
+            'slug' => 'required'
         ]);
         if ($validator->fails()) {
             return response($validator->getMessageBag(), 422);
@@ -48,13 +48,13 @@ class LPUserTraining extends Controller
                 $user->role = Role::PROVIDER_USER;
                 $user->save();
             }
+            $training = LPTraining::where('slug', $request->slug)->first();
             $lptuser = new LPTUser();
             $lptuser->user_id = $user->id;
-            $lptuser->training_id = $request->training_id;
+            $lptuser->training_id = $training->id;
             $lptuser->provider_id = Auth::user()->id;
             $lptuser->save();
-            //Send Email  for added in training
-            $training = LPTraining::where('id', $request->training_id)->first();
+            //Send Email  for added in training          
             Mail::to($user->email)->send(new AddTrainingMail($training));
             //dispatch(new AddLPTrainingUserJob($training,$user->email));
         return response()->json(["message" => "Record Added Successfully."], 201);
@@ -70,14 +70,14 @@ class LPUserTraining extends Controller
     {
         try {
 
-            $trainings = DB::select('SELECT tu.is_join,tu.id,u.first_name,u.last_name,lt.name,lt.link,lt.date FROM l_p_t_users tu JOIN users u ON tu.user_id=u.id JOIN l_p_trainings lt ON tu.training_id=lt.id WHERE tu.provider_id=? AND tu.status=? AND tu.training_id=?', [
-                Auth::user()->id, 1, $request->training_id
+            $trainings = DB::select('SELECT tu.is_join,lt.slug,tu.id,u.first_name,u.last_name,lt.name,lt.link,lt.date FROM l_p_t_users tu JOIN users u ON tu.user_id=u.id JOIN l_p_trainings lt ON tu.training_id=lt.id WHERE tu.provider_id=? AND tu.status=? AND lt.slug=?', [
+                Auth::user()->id, 1, $request->slug
             ]);
             $res['list'] = [];
             foreach ($trainings as $training) {
                 $res['list'][] = [
                     "name" => $training->name,
-                    "link" => $training->link,
+                    "link" => $training->link,                    
                     "id" => $training->id,
                     "date" => $training->date,
                     "join" => $training->is_join == 1 ? "YES" : "NO",
@@ -101,7 +101,8 @@ class LPUserTraining extends Controller
         try {
             $file = $request->file('file');
             //Excel::import(new LPUsersImport($request->training_id), $file);
-            Excel::import(new UsersImport($request->training_id), $file);
+            $training = LPTraining::where('slug', $request->slug)->first();
+            Excel::import(new UsersImport($training->id), $file);
             return response()->json(["message" => "Record added successfully "], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()],500);

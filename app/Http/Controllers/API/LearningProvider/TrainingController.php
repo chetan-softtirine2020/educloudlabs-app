@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class TrainingController extends Controller
 {
@@ -20,9 +21,9 @@ class TrainingController extends Controller
     public function createTraining(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|unique:l_p_trainings,name',
             'date' => 'required|date',
-            'description' => 'nullable',
+            'description' => 'required',
             'link' => 'required',
         ]);
         if ($validator->fails()) {
@@ -31,13 +32,13 @@ class TrainingController extends Controller
         try {
             $training = new LPTraining();
             $training->name = $request->name;
+            $training->slug = Str::slug($request->name);
             $training->date = date('Y-m-d h:i:s', strtotime($request->date));
             $training->link = $request->link;
             $training->description = $request->description;
             $training->user_id = Auth::user()->id;
             $training->save();
-
-            return response()->json(["message" => "Record Added Successfully."], 201);
+           return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -54,6 +55,7 @@ class TrainingController extends Controller
             $training = LPTraining::find($request->id);
             $res['success'] = [
                 "name" => $training->name,
+                "slug" => $training->slug,
                 "link" => $training->link,
                 "id" => $training->id,
                 "description" => $training->description,
@@ -80,6 +82,7 @@ class TrainingController extends Controller
         try {
             $training = LPTraining::find($request->id);
             $training->name = $request->name;
+            $training->slug = Str::slug($request->name);
             $training->date = $request->date;
             $training->link = $request->link;
             $training->description = $request->description;
@@ -95,12 +98,13 @@ class TrainingController extends Controller
     public function allTrainings()
     {
         try {
-            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=?",[1,Auth::user()->id]);
+            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=?", [1, Auth::user()->id]);
             $res['list'] = [];
             foreach ($trainings as $training) {
                 $res['list'][] = [
                     "name" => $training->name,
                     "link" => $training->link,
+                    "slug" => $training->slug,
                     "id" => $training->id,
                     "date" => $training->date,
                     "description" => $training->description,

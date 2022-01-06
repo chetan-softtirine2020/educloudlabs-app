@@ -14,20 +14,34 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('register', 'API\Auth\AuthController@register');
-Route::post('login', 'API\Auth\AuthController@login');
-Route::post('create-organization', 'API\Organization\OrganizationController@createOrganization');
+Route::post('/register', 'API\Auth\AuthController@register');
+Route::post('/login', 'API\Auth\AuthController@login');
+Route::post('/create-organization', 'API\Organization\OrganizationController@createOrganization');
+Route::post('/get-org-register', 'API\Organization\OrganizationController@getOrganizationsForRegister');
+
 
 Route::middleware('auth:api')->group( function () {
     //Common
-    Route::post('auth-details', 'API\UserController@authDetails');
-    Route::post('get-register-org', 'API\Organization\OrganizationController@getOrganizationsForRegister');
-    Route::post('logout', 'API\Auth\AuthController@logout');
+    Route::post('/auth-details', 'API\UserController@authDetails');
+    //Route::post('/get-register-org', 'API\Organization\OrganizationController@getOrganizationsForRegister');
+    Route::post('/logout', 'API\Auth\AuthController@logout');
     
-    /********************************** Start Admin **********************************/
-    Route::post('get-org-approved', 'API\Organization\OrganizationController@getOrganizationForApproved');
-    Route::post('org-approved', 'API\Organization\OrganizationController@approvedOrganization');
+    /********************************** Start Organization  **********************************/
+    Route::post('/get-org-approved', 'API\Organization\OrganizationController@getOrganizationForApproved');
+    Route::post('/create-org-training', 'API\Organization\TrainingController@createOrgTraining');
+    Route::post('/get-org-training', 'API\Organization\TrainingController@allOrgTrainings');
+    //Route::post('/add-user-org-training', 'API\Organization\OrgTrainingUser@allOrgTrainings');
+    //Route::post('/get-user-org-training', 'API\Organization\OrgTrainingUser@allOrgTrainings');     
 
+    /********************************** End Organization **********************************/
+
+
+   /********************************** Start Admin **********************************/
+    Route::post('/get-orgs', 'API\Admin\OrganizationController@getAllOrganizations');
+    Route::post('/get-org-approve', 'API\Admin\OrganizationController@getAllNewRegisterOrganizations');
+    Route::post('/org-approved', 'API\Admin\OrganizationController@approvedOrganization');
+   // Route::post('/get-new-orgs', 'API\Admin\OrganizationController@getAllNewRegisterOrganizations');
+    
     /********************************** End Admin **********************************/
 
 

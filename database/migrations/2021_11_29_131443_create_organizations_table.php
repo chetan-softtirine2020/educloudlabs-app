@@ -18,6 +18,7 @@ class CreateOrganizationsTable extends Migration
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('email')->unique();
+            $table->string('mobile_no')->nullable();
             $table->string('description')->nullable(); 
             $table->boolean("is_approved")->default(0);
             $table->boolean("status")->default(0);

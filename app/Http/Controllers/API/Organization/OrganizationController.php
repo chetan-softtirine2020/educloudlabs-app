@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Models\Organization;
 use Exception;
 
@@ -13,10 +14,10 @@ class OrganizationController extends Controller
 {
     public function createOrganization(Request $request)
     {
-         info($request);
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required',          
+            'name' => 'required|unique:organizations,name',
+            'email' => 'required|unique:organizations,email',          
         ]);
         if ($validator->fails()) {
             return response($validator->getMessageBag(), 422);
@@ -24,6 +25,7 @@ class OrganizationController extends Controller
         try {
             $org = new Organization();
             $org->name = $request->name;
+            $org->slug = Str::slug($request->name);
             $org->email = $request->email;
             $org->description = $request->description;
             $org->status = 0;
@@ -31,7 +33,7 @@ class OrganizationController extends Controller
             $org->save();
 
             return response()->json(["message" => "Record Added Successfully."], 201);
-        } catch (Exception $e) {
+          } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -58,38 +60,12 @@ class OrganizationController extends Controller
     public function getOrganizationsForRegister()
     {
         try {
-            $resuls = DB::select('SELECT * FROM organizations where status = ? AND is_approved=?', [1, 1]);
-            return response()->json(["result" => $resuls], 200);
+            $resuls = DB::select("SELECT id,name,slug FROM organizations where status = ? AND is_approved=?", [Organization::ACTIVE, Organization::APPROVED]);
+            return response()->json(["list" => $resuls], 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function approvedOrganization(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'org_id' => 'required',
-            'is_approved' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response($validator->getMessageBag(), 422);
-        }
-        try {
-            $org = Organization::find($request->org_id);
-            if ($request->is_approved == 1) {
-                $org->status = 1;
-            }
-            $org->is_approved = $request->is_approved;
-            $org->save();
-            if ($request->is_approved == 1) {
-                //Send Approved Email Data 
-            } else {
-                //Send Not Approved Email Data 
-            }
-
-            return response()->json(["message" => "Record approved Successfully."], 202);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
-    }
+   
 }
