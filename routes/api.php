@@ -52,7 +52,8 @@ Route::middleware('auth:api')->group( function () {
     Route::post('/get-training', 'API\LearningProvider\TrainingController@getTraining');
     Route::post('/all-trainings', 'API\LearningProvider\TrainingController@allTrainings');
     Route::post('/delete-training', 'API\LearningProvider\TrainingController@deleteTraining');
-   
+    Route::post('/lp-training-details', 'API\LearningProvider\TrainingController@getTrainingDetailsForMeeting');
+    
     // Training User
     Route::post('/lp/add-training-user', 'API\LearningProvider\LPUserTraining@addLearningProviderTrainingUser');
     Route::post('/lp/import-training-user', 'API\LearningProvider\LPUserTraining@importLearningProviderTrainingUser');     

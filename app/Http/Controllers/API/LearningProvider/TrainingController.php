@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\LearningProvider;
 
 use Exception;
 use App\Models\LPTraining;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class TrainingController extends Controller
             'name' => 'required|unique:l_p_trainings,name',
             'date' => 'required|date',
             'description' => 'required',
-            'link' => 'required',
+            //'link' => 'required',
         ]);
         if ($validator->fails()) {
             return response($validator->getMessageBag(), 422);
@@ -34,11 +35,11 @@ class TrainingController extends Controller
             $training->name = $request->name;
             $training->slug = Str::slug($request->name);
             $training->date = date('Y-m-d h:i:s', strtotime($request->date));
-            $training->link = $request->link;
+            $training->link =  $request->name;
             $training->description = $request->description;
             $training->user_id = Auth::user()->id;
             $training->save();
-           return response()->json(["message" => "Record Added Successfully."], 201);
+            return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -46,13 +47,13 @@ class TrainingController extends Controller
     public function getTraining(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required',
+            'slug' => 'required',
         ]);
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
         try {
-            $training = LPTraining::find($request->id);
+            $training = LPTraining::where('slug', $request->slug)->first();
             $res['success'] = [
                 "name" => $training->name,
                 "slug" => $training->slug,
@@ -98,7 +99,7 @@ class TrainingController extends Controller
     public function allTrainings()
     {
         try {
-            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=?", [1, Auth::user()->id]);
+            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=? ORDER BY id DESC", [1, Auth::user()->id]);
             $res['list'] = [];
             foreach ($trainings as $training) {
                 $res['list'][] = [
@@ -110,6 +111,30 @@ class TrainingController extends Controller
                     "description" => $training->description,
                 ];
             }
+            return response()->json($res, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function getTrainingDetailsForMeeting(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+        try {
+            $training = LPTraining::where('slug', $request->slug)->first();
+            $user = User::find(Auth::user()->id);
+            $res['details'] = [
+                "name" => $training->name,
+                "user" => $user->first_name . " " . $user->last_name,
+                "slug" => $training->slug,
+                "link" => $training->link,
+            ];
             return response()->json($res, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);

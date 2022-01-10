@@ -14,7 +14,7 @@ class TrainingController extends Controller
     public function getTrainingUsersWise()
     {
         try {
-            $trainings = DB::select("SELECT tu.is_join,tu.id,lt.name,lt.link,lt.date FROM l_p_t_users tu JOIN users u ON tu.user_id=u.id JOIN l_p_trainings lt ON tu.training_id=lt.id WHERE tu.user_id=? AND tu.status=?", [
+            $trainings = DB::select("SELECT tu.is_join,tu.id,lt.slug,lt.name,lt.link,lt.date FROM l_p_t_users tu JOIN users u ON tu.user_id=u.id JOIN l_p_trainings lt ON tu.training_id=lt.id WHERE tu.user_id=? AND tu.status=?", [
                 Auth::user()->id, 1
             ]);            
             $res['list'] = [];
@@ -22,6 +22,7 @@ class TrainingController extends Controller
                 $res['list'][] = [
                     "name" => $training->name,
                     "link" => $training->link,
+                    "slug" => $training->slug,
                     "id" => $training->id,
                     "date" => $training->date,
                     "join" => $training->is_join == 1 ? "YES" : "NO",                
