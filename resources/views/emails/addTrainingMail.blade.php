@@ -3,8 +3,8 @@
     You are addedd in educloud live trainig setion please click on button.
     {{ $details['description'] }}
     @component('mail::button', ['url' => $details['link']])
-        Login
+        Join
     @endcomponent
-    Thanks,
-    {{ 'Educloudlabs' }}
+    Thanks,<br>
+    {{ config('app.name') }}
 @endcomponent

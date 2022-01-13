@@ -23,7 +23,7 @@ class LPUserTraining extends Controller
 {
     public function addLearningProviderTrainingUser(Request $request)
     {
-     
+
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -41,7 +41,7 @@ class LPUserTraining extends Controller
                 $user->first_name = $request->first_name;
                 $user->last_name = $request->last_name;
                 $user->email = $request->email;
-                $user->slug = User::userSlug($request->first_name,$request->last_name);
+                $user->slug = User::userSlug($request->first_name, $request->last_name);
                 $user->mobile_no = $request->mobile_no;
                 $user->parent_id = Auth::user()->id;
                 $user->password = bcrypt("Password@123");
@@ -54,14 +54,18 @@ class LPUserTraining extends Controller
             $lptuser->training_id = $training->id;
             $lptuser->provider_id = Auth::user()->id;
             $lptuser->save();
+            $link = "https://educloudlabs.com/training/" . $request->slug;
+            ///$link="http://localhost:3000/training/" . $request->slug;
+            $training['link'] = $link;
             //Send Email  for added in training          
+            info("check link");
+            info($training);
             Mail::to($user->email)->send(new AddTrainingMail($training));
             //dispatch(new AddLPTrainingUserJob($training,$user->email));
-        return response()->json(["message" => "Record Added Successfully."], 201);
+            return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
         }
-
     }
 
 
@@ -77,7 +81,7 @@ class LPUserTraining extends Controller
             foreach ($trainings as $training) {
                 $res['list'][] = [
                     "name" => $training->name,
-                    "link" => $training->link,                    
+                    "link" => $training->link,
                     "id" => $training->id,
                     "date" => $training->date,
                     "join" => $training->is_join == 1 ? "YES" : "NO",
@@ -105,7 +109,7 @@ class LPUserTraining extends Controller
             Excel::import(new UsersImport($training->id), $file);
             return response()->json(["message" => "Record added successfully "], 201);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()],500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

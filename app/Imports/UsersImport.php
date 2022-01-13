@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\LPTraining;
 use App\Mail\AddTrainingMail;
 use Illuminate\Support\Facades\Validator;
-class UsersImport implements ToCollection,WithValidation, WithHeadingRow
+
+class UsersImport implements ToCollection, WithValidation, WithHeadingRow
 {
     public function __construct($traning_id)
     {
@@ -32,9 +33,9 @@ class UsersImport implements ToCollection,WithValidation, WithHeadingRow
             '*.first_name' => 'required',
             '*.last_name' => 'required',
             '*.mobile_no' => 'required|unique:users,mobile_no',
-            '*.email' => 'required|unique:users,email',          
+            '*.email' => 'required|unique:users,email',
         ])->validate();
-     
+
         foreach ($rows as $row) {
             $checkUser = User::where('email', $row['email'])->first();
             if (!$checkUser) {
@@ -56,6 +57,8 @@ class UsersImport implements ToCollection,WithValidation, WithHeadingRow
                 'provider_id' => Auth::user()->id,
             ]);
             $training = LPTraining::where('id', $this->training_id)->first();
+            $link = "https://educloudlabs.com/training/" . $training->slug;
+            $training['link'] = $link;
             Mail::to($row['email'])->send(new AddTrainingMail($training));
         }
     }
@@ -66,8 +69,7 @@ class UsersImport implements ToCollection,WithValidation, WithHeadingRow
             '*.first_name' => 'required',
             '*.last_name' => 'required',
             '*.mobile_no' => 'required|unique:users,mobile_no',
-            '*.email' => 'required|unique:users,email',          
+            '*.email' => 'required|unique:users,email',
         ];
     }
-  
 }

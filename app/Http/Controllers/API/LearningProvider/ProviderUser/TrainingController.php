@@ -19,7 +19,7 @@ class TrainingController extends Controller
             ]);            
             $res['list'] = [];
             foreach ($trainings as $training) {
-                $res['list'][] = [
+                 $res['list'][] = [
                     "name" => $training->name,
                     "link" => $training->link,
                     "slug" => $training->slug,
