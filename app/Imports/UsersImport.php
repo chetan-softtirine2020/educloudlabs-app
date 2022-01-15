@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\LPTraining;
 use App\Mail\AddTrainingMail;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Str;
 class UsersImport implements ToCollection, WithValidation, WithHeadingRow
 {
     public function __construct($traning_id)
@@ -37,7 +37,7 @@ class UsersImport implements ToCollection, WithValidation, WithHeadingRow
         ])->validate();
 
         foreach ($rows as $row) {
-            $checkUser = User::where('email', $row['email'])->first();
+            $checkUser = User::where('email', $row['email'])->first();         
             if (!$checkUser) {
                 User::create([
                     'first_name' => $row['first_name'],
@@ -48,7 +48,7 @@ class UsersImport implements ToCollection, WithValidation, WithHeadingRow
                     'parent_id' => Auth::user()->id,
                     'password' => bcrypt("Password@123"),
                     'role' => Role::PROVIDER_USER,
-                ]);
+                ]);           
             }
             $getUserId = User::where('email', $row['email'])->first();
             LPTUser::create([

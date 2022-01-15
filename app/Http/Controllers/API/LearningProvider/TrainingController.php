@@ -7,6 +7,7 @@ use App\Models\LPTraining;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Models\LPTUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,8 @@ class TrainingController extends Controller
             $training->link =  $request->name;
             $training->description = $request->description;
             $training->user_id = Auth::user()->id;
+            $training->is_paid = 0;
+            $training->created_by = Auth::user()->role;
             $training->save();
             return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
@@ -69,6 +72,47 @@ class TrainingController extends Controller
     }
 
 
+    public function addFreeTraining(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+        try {
+            $training = LPTraining::find($request->id);
+            $training->is_public =  $training->is_public == 1 ? 0 : 1;
+            $training->save();
+            return response()->json(["message" => "Record Updated Successfully."], 202);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function updateTrainingTime(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+            'min' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+        try {
+            $traningID=LPTraining::where('slug',$request->slug)->first();
+            $training = LPTUser::where('training_id',$traningID->id)->where('user_id',Auth::user()->id)->first();
+            $training->is_join =  1 ;
+            $training->min =  $request->min;
+            $training->save();
+            return response()->json(["message" => "Record Updated Successfully."], 202);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+
     public function updateTraining(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -86,6 +130,7 @@ class TrainingController extends Controller
             $training->slug = Str::slug($request->name);
             $training->date = $request->date;
             $training->link = $request->link;
+            $training->is_paid = 1;
             $training->description = $request->description;
             $training->user_id = 3;
             $training->save();
@@ -100,17 +145,17 @@ class TrainingController extends Controller
     {
         try {
             $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=? ORDER BY id DESC", [1, Auth::user()->id]);
-            $res['list'] = [];
-            foreach ($trainings as $training) {
-                $res['list'][] = [
-                    "name" => $training->name,
-                    "link" => $training->link,
-                    "slug" => $training->slug,
-                    "id" => $training->id,
-                    "date" => $training->date,
-                    "description" => $training->description,
-                ];
-            }
+            $res['list'] = $trainings;
+            // foreach ($trainings as $training) {
+            //     $res['list'][] = [
+            //         "name" => $training->name,
+            //         "link" => $training->link,
+            //         "slug" => $training->slug,
+            //         "id" => $training->id,
+            //         "date" => $training->date,
+            //         "description" => $training->description,
+            //     ];
+            // }
             return response()->json($res, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);

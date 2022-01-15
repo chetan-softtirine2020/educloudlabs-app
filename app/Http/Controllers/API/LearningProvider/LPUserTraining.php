@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Mail\AddTrainingMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class LPUserTraining extends Controller
 {
@@ -57,9 +58,9 @@ class LPUserTraining extends Controller
             $link = "https://educloudlabs.com/training/" . $request->slug;
             ///$link="http://localhost:3000/training/" . $request->slug;
             $training['link'] = $link;
-            //Send Email  for added in training          
-            info("check link");
-            info($training);
+            $training['password'] = Str::random(8);
+            //Send Email  for added in training         
+
             Mail::to($user->email)->send(new AddTrainingMail($training));
             //dispatch(new AddLPTrainingUserJob($training,$user->email));
             return response()->json(["message" => "Record Added Successfully."], 201);

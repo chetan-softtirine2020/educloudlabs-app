@@ -107,7 +107,7 @@ class OrganizationController extends Controller
                 $user->role = Role::ORGANIZATION;  
                 $user->save();
                 //Send Approved Email Data 
-                $details['message'] = "Your organization register request has been approved please login your register email and default password is Password@123";
+                $details['message'] = "Your organization register request has been approved please login your register email and default password is"." ".Str::random(8);
             } else {
                 //Send Not Approved Email Data 
                 $details['message'] = "Your organization register request  not approved so  contact to Educloudlabs admin on admin@educloudlabs.com";
