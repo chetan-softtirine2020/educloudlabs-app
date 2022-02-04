@@ -7,7 +7,7 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends BaseController
@@ -145,35 +145,6 @@ class AuthController extends BaseController
             $token = $request->token;
             $token->revoke();
             return response()->json(['message' => 'You have been successfully logged out!'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
-    }
-
-
-    public function changePassword(Request $request)
-    {
-        info($request);
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'current_password' => 'required',
-                'password' => 'required|string|min:6|confirmed',
-                'password_confirmation' => 'required',
-            ]
-        );
-        if ($validator->fails()) {
-            return response($validator->getMessageBag(), 422);
-        }
-        try {
-            $currentPassword = Auth::user()->password;
-            if (!Hash::check($request->current_password, $currentPassword)) {
-                return response()->json(['message' => "Current password is incorrect"], 403);
-            }
-            $user = User::find(Auth::user()->id);
-            $user->password = bcrypt($request->password);
-            $user->save();
-            return response()->json(['message' => 'Your passwrod has been change successfully.'], 202);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }

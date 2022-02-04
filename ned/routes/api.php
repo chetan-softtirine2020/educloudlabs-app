@@ -27,7 +27,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/auth-details', 'API\UserController@authDetails');
     //Route::post('/get-register-org', 'API\Organization\OrganizationController@getOrganizationsForRegister');
     Route::post('/logout', 'API\Auth\AuthController@logout');
-    Route::post('/change-password', 'API\Auth\AuthController@changePassword');
 
     /********************************** Start Organization  **********************************/
     Route::post('/get-org-approved', 'API\Organization\OrganizationController@getOrganizationForApproved');
@@ -73,5 +72,7 @@ Route::middleware('auth:api')->group(function () {
     //Add Learning Provider user 
     /**********************************END Learning Provider**********************************/
     //Admin 
+
+
 
 });
