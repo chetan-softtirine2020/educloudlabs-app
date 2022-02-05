@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Illuminate\Support\Facades\Mail;
 use App\Models\LPTraining;
 use App\Mail\AddTrainingMail;
+use App\Jobs\AddLPTrainingUserJob;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 class UsersImport implements ToCollection, WithValidation, WithHeadingRow
@@ -59,7 +60,8 @@ class UsersImport implements ToCollection, WithValidation, WithHeadingRow
             $training = LPTraining::where('id', $this->training_id)->first();
             $link = "https://educloudlabs.com/training/" . $training->slug;
             $training['link'] = $link;
-            Mail::to($row['email'])->send(new AddTrainingMail($training));
+            dispatch(new AddLPTrainingUserJob($training,$getUserId->email));
+            // Mail::to($row['email'])->send(new AddTrainingMail($training));
         }
     }
 

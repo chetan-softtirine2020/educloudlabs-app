@@ -61,8 +61,8 @@ class LPUserTraining extends Controller
             $training['password'] = Str::random(8);
             //Send Email  for added in training         
 
-            Mail::to($user->email)->send(new AddTrainingMail($training));
-            //dispatch(new AddLPTrainingUserJob($training,$user->email));
+            //Mail::to($user->email)->send(new AddTrainingMail($training));
+            dispatch(new AddLPTrainingUserJob($training,$user->email));
             return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
