@@ -16,7 +16,7 @@ class CreateLPTrainingsTable extends Migration
         Schema::create('l_p_trainings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->string('description')->nullable();
             $table->string('link');
             $table->dateTime('date');

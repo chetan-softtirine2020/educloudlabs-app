@@ -23,7 +23,7 @@ class TrainingController extends Controller
     public function createTraining(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:l_p_trainings,name',
+            'name' => 'required',
             'date' => 'required|date',
             'description' => 'required',
             //'link' => 'required',

@@ -16,6 +16,8 @@ class CreateTraningCoursesTable extends Migration
         Schema::create('traning_courses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('training_id')->nullable();   
+            $table->integer("category_id")->nullable();
+            $table->integer("stage_id")->nullable();
             $table->string('name');
             $table->boolean('is_complete')->default(0);
             $table->dateTime('completed_date')->nullable();

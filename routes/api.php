@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', 'API\Auth\AuthController@register');
 Route::post('/login', 'API\Auth\AuthController@login');
+Route::post('/forgot-password', 'API\Auth\ForgotPasswordController@forgotPassword');
+Route::post('/reset-password', 'API\Auth\ForgotPasswordController@resetPassword');
 Route::post('/create-organization', 'API\Organization\OrganizationController@createOrganization');
 Route::post('/get-org-register', 'API\Organization\OrganizationController@getOrganizationsForRegister');
 

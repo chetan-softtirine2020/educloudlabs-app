@@ -2,46 +2,32 @@
 
 namespace App\Imports;
 
-use App\Models\User;
-use App\Models\LPTUser;
-use App\Models\Role;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithStartRow;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Illuminate\Support\Collection;
 
-class LPUsersImport implements ToModel, WithHeadingRow
+class LPUsersImport implements ToCollection, WithChunkReading, ShouldQueue,WithStartRow
 {
-    public function __construct($traning_id)
+    public function collection(Collection $rows)
     {
-        $this->training_id = $traning_id;
-        $this->users = User::select("id", "email")->get();
+         info("rows collection");
+         info($rows);  
     }
-    /**
-     * @param array $row
-     *
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function model(array $row)
+
+     public function startRow(): int 
     {
-        $user = User::where("email", $row['email'])->first();
-        if ($user) {
-            return new User([
-                'first_name' => $row['first_name'],
-                'last_name' => $row['last_name'],
-                'email' => $row['email'],
-                'mobile_no' => $row['mobile_no'],
-                'parent_id' => Auth::user()->id,
-                'password' => bcrypt("Password@123"),
-                'role' => Role::PROVIDER_USER,
-            ]);
-        }
-        $lpuser = User::where("email", $row['email'])->first();
-        if ($lpuser) {
-            $lptuser = new LPTUser();
-            $lptuser->user_id = $user->id;
-            $lptuser->training_id =$this->training_id;
-            $lptuser->provider_id = Auth::user()->id;
-            $lptuser->save();
-        }
+         return 1;
+    }
+
+    public function batchSize(): int
+    {
+        return 500;
+    }
+
+    public function chunkSize(): int
+    {
+        return 500;
     }
 }

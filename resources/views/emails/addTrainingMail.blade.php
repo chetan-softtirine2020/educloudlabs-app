@@ -1,6 +1,6 @@
 @component('mail::message')
-    {{ $details['name'] }}
-    You are addedd in educloud live trainig setion please click on button.
+    Hi, {{ $details['user_name'] }},<br>
+    I would like to invite you to attend a training on Educloudlabs.
     {{ $details['description'] }}
     @component('mail::button', ['url' => $details['link']])
         Join
