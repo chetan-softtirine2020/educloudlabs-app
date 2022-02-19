@@ -66,7 +66,7 @@ class LPUserTraining extends Controller
             $details['name'] = $training->name;
             $details['user_name'] = $request->first_name;
             $details['link'] = $link;
-            $details['description'] = $description . " " . $otherText;     
+            $details['description'] = $description . " " . $otherText;
             //Mail::to($user->email)->send(new AddTrainingMail($training));
             dispatch(new AddLPTrainingUserJob($details, $user->email));
             return response()->json(["message" => "Record Added Successfully."], 201);
@@ -123,6 +123,23 @@ class LPUserTraining extends Controller
                 //info($import->failures());
             }
             return response()->json(['message' => "Record added suceessfully"], 201);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateTrainingJoinStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response($validator->getMessageBag(), 422);
+        }
+        try {
+            $training = LPTraining::where('slug', $request->slug)->first();
+            LPTUser::where('training_id', $training->training_id)->where('user_id', Auth::user()->id)->update(['is_join' => 1]);
+            return response()->json(['message' => "Record updated suceessfully"], 202);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }

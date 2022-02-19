@@ -45,6 +45,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-orgs', 'API\Admin\OrganizationController@getAllOrganizations');
     Route::post('/get-org-approve', 'API\Admin\OrganizationController@getAllNewRegisterOrganizations');
     Route::post('/org-approved', 'API\Admin\OrganizationController@approvedOrganization');
+
+    Route::post('/admin/get-users-list', 'API\Admin\UserController@getUserList');
+    Route::post('/admin/get-child-users-list', 'API\Admin\UserController@getUserChildUser');
     // Route::post('/get-new-orgs', 'API\Admin\OrganizationController@getAllNewRegisterOrganizations');
 
     /********************************** End Admin **********************************/
@@ -66,6 +69,7 @@ Route::middleware('auth:api')->group(function () {
     // Training User
     Route::post('/lp/add-training-user', 'API\LearningProvider\LPUserTraining@addLearningProviderTrainingUser');
     Route::post('/lp/import-training-user', 'API\LearningProvider\LPUserTraining@importLearningProviderTrainingUser');
+    Route::post('/lp/update-training-join-status', 'API\LearningProvider\LPUserTraining@updateTrainingJoinStatus');
     Route::post('/lp/get-training-users', 'API\LearningProvider\LPUserTraining@getTrainingUsers');
 
     ////// Provider User
