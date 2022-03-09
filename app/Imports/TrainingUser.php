@@ -43,10 +43,10 @@ class TrainingUser implements
      */
     public function collection(Collection $rows)
     {
-        Log::info("Rowaaaaaa");
-        Log::info($rows);
+      
         foreach ($rows as $row) {
             $checkUser = User::where('email', $row['email'])->first();
+            $password = bcrypt(Str::random(8));
             if (!$checkUser) {
                 $slug = User::userSlug($row["firstname"], $row["lastname"]);
                 $user = User::create([
@@ -56,7 +56,7 @@ class TrainingUser implements
                     'slug' => $slug,
                     'mobile_no' => $row["mobileno"],
                     'parent_id' => Auth::user()->id,
-                    'password' => bcrypt("Password@123"),
+                    'password' => $password,
                     'role' => Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER
                 ]);
                 $user->slug = $slug;
@@ -71,12 +71,12 @@ class TrainingUser implements
                 ]);
                 $training = LPTraining::where('id', $this->training_id)->first();
                 $link = "https://educloudlabs.com/training/" . $training->slug;
-                $otherText = !$checkUser ? "Use your default password for the login your account " . Str::random(8) : " ";
+                $otherText = !$checkUser ? "Use your default password for the login your account " . $password : " ";
                 $description = $training['description'];
                 $details['name'] = $training->name;
                 $details['user_name'] = $row['firstname'];
                 $details['link'] = $link;
-                $details['description'] = $description . " " . $otherText;               
+                $details['description'] = $description . " " . $otherText;
                 dispatch(new AddLPTrainingUserJob($details, $row["email"]));
             }
         }

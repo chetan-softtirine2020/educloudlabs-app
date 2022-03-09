@@ -68,4 +68,16 @@ class OrganizationController extends Controller
     }
 
    
+    public function getSubAdminList()
+    {
+        try {
+            $users = DB::select('SELECT * FROM organizations where status = ? AND is_approved=?', [0, 0]);
+            $res['list'] = $users;            
+            return response()->json($res, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+   
 }

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Mail\AddTrainingMail;
+use App\Models\TrainingInfo;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -138,12 +139,33 @@ class LPUserTraining extends Controller
         }
         try {
             $training = LPTraining::where('slug', $request->slug)->first();
-            LPTUser::where('training_id', $training->training_id)->where('user_id', Auth::user()->id)->update(['is_join' => 1]);
-            return response()->json(['message' => "Record updated suceessfully"], 202);
+            LPTUser::where('training_id', $training->id)->where('user_id', Auth::user()->id)->update(['is_join' => 1]);
+            $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
+            $training->status = 1; //LPTraining::START;
+            $training->save();
+
+            if (!$user) {
+                $user = new TrainingInfo();
+                $user->training_id = $training->id;
+                $user->user_id = Auth::user()->id;
+                $user->join_count = 1;
+                $user->total_join = 1;
+            } else {
+                if ($user && $request->is_start) {
+                    $user->join_count = $user->join_count + 1;
+                }
+                if ($user && $request->is_end) {
+                    $user->join_count = $user->join_count != 0 ? $user->join_count - 1 : TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->delete();
+                }
+            }
+            $user->save();
+            return response()->json(['count' => $user->join_count], 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
+
 
 
     // public function importLearningProviderTrainingUser(Request $request)

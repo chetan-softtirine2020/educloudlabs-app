@@ -12,4 +12,5 @@ class Role extends Model
     const ORGANIZATION = 4;
     const PROVIDER_USER = 5;
     const ORG_USER = 6;
+    const ORG_SUB_ADMIN = 7;
 }

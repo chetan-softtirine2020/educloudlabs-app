@@ -55,7 +55,9 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
-
+ 
+    'ui_url' => env('APP_URL', 'https://educloudlabs.com'),
+   
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

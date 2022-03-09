@@ -48,6 +48,21 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/admin/get-users-list', 'API\Admin\UserController@getUserList');
     Route::post('/admin/get-child-users-list', 'API\Admin\UserController@getUserChildUser');
+
+    //Department
+    Route::post('/add-department', 'API\Organization\DepartmentController@createDepartment');
+    Route::post('/get-departments', 'API\Organization\DepartmentController@getDepartments');
+
+    //Branch
+    Route::post('/add-branch', 'API\Organization\BranchController@createBranch');
+    Route::post('/get-branches', 'API\Organization\BranchController@getBranches');
+    //Section
+    Route::post('/add-section', 'API\Organization\SectionController@createSection');
+    Route::post('/get-sections', 'API\Organization\SectionController@getSections');
+    //Add Org Sub Admin  
+    Route::post('/add-org-sub-admin', 'API\Organization\OrgSubAdminController@createOrgSubAdmin');
+    Route::post('/get-org-sub-admin', 'API\Organization\OrgSubAdminController@getSubAdminList');
+    
     // Route::post('/get-new-orgs', 'API\Admin\OrganizationController@getAllNewRegisterOrganizations');
 
     /********************************** End Admin **********************************/

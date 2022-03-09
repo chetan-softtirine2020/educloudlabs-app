@@ -10,4 +10,8 @@ class BaseModel extends Model
     const INACTIVE = 0;
     const APPROVED = 1;
     const APPROVE = 0;
-}
+   //Traning 
+    const REGISTER=1;
+    const START=2;
+    const COMPLETED=3;
+    }
