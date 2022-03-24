@@ -79,7 +79,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/lp-public-training', 'API\LearningProvider\TrainingController@addFreeTraining');
     Route::post('/get-dashboard-data', 'API\LearningProvider\DashboardController@getDashboardData');
     Route::post('/update-training-min', 'API\LearningProvider\TrainingController@updateTrainingTime');
-
+    Route::post('/delete-trainings', 'API\LearningProvider\TrainingController@deleteTrainings');
+ 
 
     // Training User
     Route::post('/lp/add-training-user', 'API\LearningProvider\LPUserTraining@addLearningProviderTrainingUser');

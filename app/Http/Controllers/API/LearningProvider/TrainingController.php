@@ -101,9 +101,9 @@ class TrainingController extends Controller
             return response(['errors' => $validator->errors()->all()], 422);
         }
         try {
-            $traningID=LPTraining::where('slug',$request->slug)->first();
-            $training = LPTUser::where('training_id',$traningID->id)->where('user_id',Auth::user()->id)->first();
-            $training->is_join =  1 ;
+            $traningID = LPTraining::where('slug', $request->slug)->first();
+            $training = LPTUser::where('training_id', $traningID->id)->where('user_id', Auth::user()->id)->first();
+            $training->is_join =  1;
             $training->min =  $request->min;
             $training->save();
             return response()->json(["message" => "Record Updated Successfully."], 202);
@@ -144,7 +144,7 @@ class TrainingController extends Controller
     public function allTrainings()
     {
         try {
-            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=? ORDER BY id DESC", [1, Auth::user()->id]);
+            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=? ORDER BY id DESC", [LPTraining::ACTIVE, Auth::user()->id]);
             $res['list'] = $trainings;
             // foreach ($trainings as $training) {
             //     $res['list'][] = [
@@ -181,6 +181,25 @@ class TrainingController extends Controller
                 "link" => $training->link,
             ];
             return response()->json($res, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteTrainings(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+        try {
+            $training = LPTraining::where('slug', $request->slug)->first();
+            $training->status = LPTraining::INACTIVE;
+            $training->save();
+            LPTUser::where('training_id', $training->id)->update(['status' => LPTUser::INACTIVE]);
+            return response()->json(['message' => "Record delete sucessfully"], 202);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
