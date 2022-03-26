@@ -41,6 +41,7 @@ class LPUserTraining extends Controller
         }
         try {
             $user = User::where('email', $request->email)->first();
+            $password = Str::random(8);
             if (!$user) {
                 $user = new User();
                 $user->first_name = $request->first_name;
@@ -49,7 +50,7 @@ class LPUserTraining extends Controller
                 $user->slug = User::userSlug($request->first_name, $request->last_name);
                 $user->mobile_no = $request->mobile_no;
                 $user->parent_id = Auth::user()->id;
-                $user->password = bcrypt("Password@123");
+                $user->password = bcrypt($password);
                 $user->role = Role::PROVIDER_USER;
                 $user->save();
             }
@@ -62,7 +63,7 @@ class LPUserTraining extends Controller
             $link = "https://educloudlabs.com/training/" . $request->slug;
             ///$link="http://localhost:3000/training/" . $request->slug;            
             //Send Email  for added in training         
-            $otherText = !$user ? "Use your default password for the login your account " . Str::random(8) : " ";
+            $otherText = !$user ? "Use your default password for the login your account " . $password : " ";
             $description = $training['description'];
             $details['name'] = $training->name;
             $details['user_name'] = $request->first_name;

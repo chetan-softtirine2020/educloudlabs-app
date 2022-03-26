@@ -46,7 +46,7 @@ class TrainingUser implements
       
         foreach ($rows as $row) {
             $checkUser = User::where('email', $row['email'])->first();
-            $password = bcrypt(Str::random(8));
+            $password = Str::random(8);
             if (!$checkUser) {
                 $slug = User::userSlug($row["firstname"], $row["lastname"]);
                 $user = User::create([
@@ -56,7 +56,7 @@ class TrainingUser implements
                     'slug' => $slug,
                     'mobile_no' => $row["mobileno"],
                     'parent_id' => Auth::user()->id,
-                    'password' => $password,
+                    'password' => bcrypt($password),
                     'role' => Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER
                 ]);
                 $user->slug = $slug;

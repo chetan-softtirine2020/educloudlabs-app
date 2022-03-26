@@ -67,7 +67,7 @@ Route::middleware('auth:api')->group(function () {
 
     /********************************** End Admin **********************************/
 
-
+ 
     /********************************** Start Learning Provider**********************************/
     //Training
     Route::post('/create-training', 'API\LearningProvider\TrainingController@createTraining');
