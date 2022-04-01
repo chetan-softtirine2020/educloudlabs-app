@@ -76,6 +76,7 @@ class AuthController extends BaseController
                 '_id' => $user->id,
                 'email' => $user->email,
                 'roles' => [$role],
+                'role' => $role,
                 'token' => $token
             ];
             return response()->json($success, 201);
@@ -118,6 +119,7 @@ class AuthController extends BaseController
                     'email' => $user->email,
                     'mobile_no' => $user->mobile_no,
                     'roles' => [$role->name],
+                    'role' => $role->name,
                     'token' => $token
                 ];
                 return response()->json($success, 200);

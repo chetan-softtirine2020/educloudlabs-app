@@ -16,7 +16,7 @@ class TrainingController extends Controller
     {
         try {
             $trainings = DB::select("SELECT tu.is_join,tu.id,lt.slug,lt.name,lt.link,lt.date FROM l_p_t_users tu JOIN users u ON tu.user_id=u.id JOIN l_p_trainings lt ON tu.training_id=lt.id WHERE tu.user_id=? AND tu.status=?", [
-                Auth::user()->id, LPTUser::INACTIVE
+                Auth::user()->id, LPTUser::ACTIVE
             ]);
             $res['list'] = [];
             foreach ($trainings as $training) {

@@ -28,7 +28,6 @@ class LPUserTraining extends Controller
 {
     public function addLearningProviderTrainingUser(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -132,6 +131,7 @@ class LPUserTraining extends Controller
 
     public function updateTrainingJoinStatus(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required',
         ]);
@@ -140,11 +140,11 @@ class LPUserTraining extends Controller
         }
         try {
             $training = LPTraining::where('slug', $request->slug)->first();
-            LPTUser::where('training_id', $training->id)->where('user_id', Auth::user()->id)->update(['is_join' => 1]);
             $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
             $training->status = 1; //LPTraining::START;
             $training->save();
-
+            $trainingUser = LPTUser::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
+            $trainingUser ? $trainingUser->is_join = 1 : "";
             if (!$user) {
                 $user = new TrainingInfo();
                 $user->training_id = $training->id;
@@ -157,25 +157,14 @@ class LPUserTraining extends Controller
                 }
                 if ($user && $request->is_end) {
                     $user->join_count = $user->join_count != 0 ? $user->join_count - 1 : TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->delete();
+                    $trainingUser ? $trainingUser->min = $request->min + $trainingUser->min : "";
                 }
             }
+            $trainingUser ? $trainingUser->save() : "";
             $user->save();
             return response()->json(['count' => $user->join_count], 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
-
-
-
-    // public function importLearningProviderTrainingUser(Request $request)
-    // {
-    //     info("Exvle file");
-    //     info($request);
-    //     $file = $request->file('file');
-    //     $training = LPTraining::where('slug', $request->slug)->first();
-    //     $import = new TrainingUsersImport($training->id);
-    //     $import->import($file);
-    // }
 }

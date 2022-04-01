@@ -25,7 +25,7 @@ class DepartmentController extends Controller
             $department = new Department();
             $department->name = $request->name;
             $department->slug = Str::slug($request->name);
-            $department->save();
+            $department->save(); 
             return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);

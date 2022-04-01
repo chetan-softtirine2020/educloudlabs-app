@@ -144,7 +144,7 @@ class TrainingController extends Controller
     public function allTrainings()
     {
         try {
-            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE status=? AND user_id=? ORDER BY id DESC", [LPTraining::ACTIVE, Auth::user()->id]);
+            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE  user_id=? ORDER BY id DESC", [Auth::user()->id]);
             $res['list'] = $trainings;
             // foreach ($trainings as $training) {
             //     $res['list'][] = [
