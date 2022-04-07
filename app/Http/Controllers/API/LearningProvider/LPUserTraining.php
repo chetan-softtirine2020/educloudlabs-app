@@ -132,6 +132,8 @@ class LPUserTraining extends Controller
     public function updateTrainingJoinStatus(Request $request)
     {
 
+        info("Nww Call");
+        info($request);
         $validator = Validator::make($request->all(), [
             'slug' => 'required',
         ]);
@@ -140,6 +142,7 @@ class LPUserTraining extends Controller
         }
         try {
             $training = LPTraining::where('slug', $request->slug)->first();
+            LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->update(['status' => 1]);
             $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
             $training->status = 1; //LPTraining::START;
             $training->save();
@@ -150,10 +153,11 @@ class LPUserTraining extends Controller
                 $user->training_id = $training->id;
                 $user->user_id = Auth::user()->id;
                 $user->join_count = 1;
-                $user->total_join = 1;
+               //  $user->total_join = 1;
             } else {
                 if ($user && $request->is_start) {
                     $user->join_count = $user->join_count + 1;
+                    //$user->join_count = 1;
                 }
                 if ($user && $request->is_end) {
                     $user->join_count = $user->join_count != 0 ? $user->join_count - 1 : TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->delete();

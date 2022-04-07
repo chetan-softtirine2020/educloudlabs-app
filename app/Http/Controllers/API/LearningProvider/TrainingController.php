@@ -134,7 +134,6 @@ class TrainingController extends Controller
             $training->description = $request->description;
             $training->user_id = 3;
             $training->save();
-
             return response()->json(["message" => "Record Updated Successfully."], 202);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
