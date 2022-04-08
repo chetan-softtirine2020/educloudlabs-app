@@ -30,6 +30,7 @@ Route::middleware('auth:api')->group(function () {
     //Route::post('/get-register-org', 'API\Organization\OrganizationController@getOrganizationsForRegister');
     Route::post('/logout', 'API\Auth\AuthController@logout');
     Route::post('/change-password', 'API\Auth\AuthController@changePassword');
+    Route::post('/current-token', 'API\Auth\AuthController@getCurrentToken');
 
     /********************************** Start Organization  **********************************/
     Route::post('/get-org-approved', 'API\Organization\OrganizationController@getOrganizationForApproved');
@@ -62,12 +63,12 @@ Route::middleware('auth:api')->group(function () {
     //Add Org Sub Admin  
     Route::post('/add-org-sub-admin', 'API\Organization\OrgSubAdminController@createOrgSubAdmin');
     Route::post('/get-org-sub-admin', 'API\Organization\OrgSubAdminController@getSubAdminList');
-    
+
     // Route::post('/get-new-orgs', 'API\Admin\OrganizationController@getAllNewRegisterOrganizations');
 
     /********************************** End Admin **********************************/
 
- 
+
     /********************************** Start Learning Provider**********************************/
     //Training
     Route::post('/create-training', 'API\LearningProvider\TrainingController@createTraining');
@@ -80,12 +81,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-dashboard-data', 'API\LearningProvider\DashboardController@getDashboardData');
     Route::post('/update-training-min', 'API\LearningProvider\TrainingController@updateTrainingTime');
     Route::post('/delete-trainings', 'API\LearningProvider\TrainingController@deleteTrainings');
- 
+
 
     // Training User
     Route::post('/lp/add-training-user', 'API\LearningProvider\LPUserTraining@addLearningProviderTrainingUser');
     Route::post('/lp/import-training-user', 'API\LearningProvider\LPUserTraining@importLearningProviderTrainingUser');
     Route::post('/lp/update-training-join-status', 'API\LearningProvider\LPUserTraining@updateTrainingJoinStatus');
+    Route::post('/lp/get-training-join-count', 'API\LearningProvider\LPUserTraining@getJoinCount');
+    Route::post('/reactive-training', 'API\LearningProvider\LPUserTraining@reActiveUserTraining');
+
     Route::post('/lp/get-training-users', 'API\LearningProvider\LPUserTraining@getTrainingUsers');
 
     ////// Provider User

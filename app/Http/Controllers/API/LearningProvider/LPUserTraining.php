@@ -153,7 +153,7 @@ class LPUserTraining extends Controller
                 $user->training_id = $training->id;
                 $user->user_id = Auth::user()->id;
                 $user->join_count = 1;
-               //  $user->total_join = 1;
+                //  $user->total_join = 1;
             } else {
                 if ($user && $request->is_start) {
                     $user->join_count = $user->join_count + 1;
@@ -167,6 +167,50 @@ class LPUserTraining extends Controller
             $trainingUser ? $trainingUser->save() : "";
             $user->save();
             return response()->json(['count' => $user->join_count], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getJoinCount(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response($validator->getMessageBag(), 422);
+        }
+        try {
+            $training = LPTraining::where('slug', $request->slug)->first();
+            // LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->update(['status' => 1]);
+            $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
+            $count = 0;
+            if ($user) {
+                $count = $user->join_count;
+            }
+            return response()->json(['count' => $count], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function reActiveUserTraining(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response($validator->getMessageBag(), 422);
+        }
+        try {
+            $training = LPTraining::where('slug', $request->slug)->first();
+            $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
+            if ($user && $user->join_count > 0) {
+                $user->join_count = 0;
+                $user->save();
+            }
+            return response()->json(['message' => "Reactive Training"], 202);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }

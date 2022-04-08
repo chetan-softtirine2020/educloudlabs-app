@@ -46,7 +46,6 @@ class AuthController extends BaseController
             if ($request->type == 6) {
                 $user->is_parent = $request->org_id;
             }
-            $user->save();
             switch ($request->user_type) {
                 case Role::USER:
                     $role = "user";
@@ -68,6 +67,9 @@ class AuthController extends BaseController
                     break;
             }
             $token = $user->createToken('MyApp')->accessToken;
+            $user->is_login = 1;
+            $user->current_token = $token;
+            $user->save();
             $success['success'] = [
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
@@ -106,6 +108,16 @@ class AuthController extends BaseController
             return response($validator->getMessageBag(), 422);
         }
         try {
+            $checkLoginUser = User::where('email', $request->email)->first();
+            if ($request->is_previous && $checkLoginUser) {
+                $checkLoginUser->is_login = 0;
+                $checkLoginUser->current_token = null;
+                $checkLoginUser->save();
+            }
+            if ($checkLoginUser && $checkLoginUser->is_login == 1) {
+                return response()->json(['message' => "Your Account already login into another device or tab"], 403);
+            }
+
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $authenticated_user = Auth::user();
                 $user = User::find($authenticated_user->id);
@@ -122,6 +134,9 @@ class AuthController extends BaseController
                     'role' => $role->name,
                     'token' => $token
                 ];
+                $user->is_login = 1;
+                $user->current_token = $token;
+                $user->save();
                 return response()->json($success, 200);
                 //return $this->sendResponse($success, 'User login successfully.');
             } else {
@@ -144,9 +159,28 @@ class AuthController extends BaseController
             return response($validator->getMessageBag(), 422);
         }
         try {
-            $token = $request->token;
-            $token->revoke();
+            User::where('id', Auth::user()->id)->update(['is_login' => 0, 'current_token' => null]);
+            $request->user()->token()->revoke();
             return response()->json(['message' => 'You have been successfully logged out!'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getCurrentToken(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'email' =>  'required',
+            ]
+        );
+        if ($validator->fails()) {
+            return response($validator->getMessageBag(), 422);
+        }
+        try {
+            $user = User::where('id', Auth::user()->id)->first();
+            return response()->json($user->current_token, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -155,7 +189,7 @@ class AuthController extends BaseController
 
     public function changePassword(Request $request)
     {
-        info($request);
+
         $validator = Validator::make(
             $request->all(),
             [
