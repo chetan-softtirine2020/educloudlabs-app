@@ -182,19 +182,32 @@ class LPUserTraining extends Controller
         }
         try {
             $training = LPTraining::where('slug', $request->slug)->first();
-            // LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->update(['status' => 1]);
+            //LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->update(['status' => 1]);
             $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
             $count = 0;
+            $isAssing = 0;
+            $isModerator = false;
+            $chekTraning = LPTUser::where("user_id", Auth::user()->id)->where('training_id', $training->id)->first();
+            if ($chekTraning) {
+                $isAssing = 1;
+                $isModerator = false;
+            } else {
+                $tr = LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->first();
+                if ($tr) {
+                    $isAssing = 1;
+                    $isModerator = true;
+                }
+            }
             if ($user) {
                 $count = $user->join_count;
             }
-            return response()->json(['count' => $count], 200);
+            return response()->json(['count' => $count, 'isAssing' => $isAssing, 'isModerator' => $isModerator], 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-
+    
     public function reActiveUserTraining(Request $request)
     {
         $validator = Validator::make($request->all(), [
