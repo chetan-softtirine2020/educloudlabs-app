@@ -156,8 +156,8 @@ class LPUserTraining extends Controller
                 //  $user->total_join = 1;
             } else {
                 if ($user && $request->is_start) {
-                    $user->join_count = $user->join_count + 1;
-                    //$user->join_count = 1;
+                   // $user->join_count = $user->join_count + 1;
+                    $user->join_count = 1;
                 }
                 if ($user && $request->is_end) {
                     $user->join_count = $user->join_count != 0 ? $user->join_count - 1 : TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->delete();
