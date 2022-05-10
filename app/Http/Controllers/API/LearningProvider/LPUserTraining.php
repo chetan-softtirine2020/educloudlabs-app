@@ -182,7 +182,7 @@ class LPUserTraining extends Controller
         }
         try {
             $training = LPTraining::where('slug', $request->slug)->first();
-            //LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->update(['status' => 1]);
+            //LPTraining::where('slug', $request->slug)->where('user_id', Auth::user()->id)->update(['status' => 2]);
             $user = TrainingInfo::where('training_id', $training->id)->where('user_id', Auth::user()->id)->first();
             $count = 0;
             $isAssing = 0;

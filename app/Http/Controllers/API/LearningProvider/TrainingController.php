@@ -40,7 +40,7 @@ class TrainingController extends Controller
             $training->description = $request->description;
             $training->user_id = Auth::user()->id;
             $training->is_paid = 0;
-            $training->created_by = Auth::user()->role;
+            $training->created_by = Auth::user()->id;
             $training->save();
             return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
