@@ -36,7 +36,7 @@ class RoleSeeder extends Seeder
          $role->slug=Str::slug("organization");
          $role->save();
 
-          // Role Organization 5
+          // Role Provider User 5
           $role=new Role();
           $role->name="provider_user";
           $role->slug=Str::slug("provider_user");

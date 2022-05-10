@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\LearningProvider;
 
 use App\Http\Controllers\Controller;
+use App\Models\LPTraining;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -13,10 +14,12 @@ class DashboardController extends Controller
     public function getDashboardData()
     {
         try {
-            $trainings = DB::select("SELECT lp.name,lp.slug,lp.description,lp.date,lp.id FROM l_p_trainings lp WHERE lp.status=? AND lp.user_id  ORDER BY lp.id DESC LIMIT 3", [1,Auth::user()->id]);
+            info("Auth Id");
+            info(Auth::user()->id);
+            $trainings = DB::select("SELECT lp.name,lp.slug,lp.description,lp.date,lp.id FROM l_p_trainings lp WHERE   lp.user_id AND lp.status=?  ORDER BY lp.id DESC LIMIT 3", [Auth::user()->id, LPTraining::ACTIVE]);
             $res['list'] = $trainings;
             return response()->json($res, 200);
-          } catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }

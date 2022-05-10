@@ -13,7 +13,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        //
+        \League\OAuth2\Server\Exception\OAuthServerException::class
     ];
 
     /**
@@ -35,9 +35,13 @@ class Handler extends ExceptionHandler
      * @throws \Exception
      */
     public function report(Throwable $exception)
-    {
+    {  
+        if ($exception instanceof \League\OAuth2\Server\Exception\OAuthServerException && $exception->getCode() == 9) {
+            return;
+        }
         parent::report($exception);
     }
+    
 
     /**
      * Render an exception into an HTTP response.

@@ -66,10 +66,7 @@ class AuthController extends BaseController
                     $role = "admin";
                     break;
             }
-            $token = $user->createToken('MyApp')->accessToken;
-            $user->is_login = 1;
-            $user->current_token = $token;
-            $user->save();
+           // $token = $user->createToken('MyApp')->accessToken;
             $success['success'] = [
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
@@ -79,15 +76,17 @@ class AuthController extends BaseController
                 'email' => $user->email,
                 'roles' => [$role],
                 'role' => $role,
-                'token' => $token
+                'token' => ""
             ];
+           // $user->is_login = 1;
+          //  $user->current_token = $token;
+            $user->save();
             return response()->json($success, 201);
         } catch (\Exception $e) {
             return response(['message' => $e->getMessage()], 500);
-            //return response()->json();
+            //return response()->json();7
         }
     }
-
 
     /**
      * Login api
@@ -189,7 +188,6 @@ class AuthController extends BaseController
 
     public function changePassword(Request $request)
     {
-
         $validator = Validator::make(
             $request->all(),
             [
