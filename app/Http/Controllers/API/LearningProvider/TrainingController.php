@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class TrainingController extends Controller
 {
@@ -22,6 +23,10 @@ class TrainingController extends Controller
 
     public function createTraining(Request $request)
     {
+          $disk=Storage::disk('gcs');
+          $disk->put('hola.txt',"hola text test");
+
+       
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'date' => 'required|date',

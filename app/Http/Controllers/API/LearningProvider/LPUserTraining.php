@@ -20,9 +20,13 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Mail\AddTrainingMail;
 use App\Models\TrainingInfo;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Google\Cloud\Storage\StorageClient;
+//use Storage;
 
 class LPUserTraining extends Controller
 {
@@ -105,6 +109,7 @@ class LPUserTraining extends Controller
 
     public function importLearningProviderTrainingUser(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'file' => 'required|file',
         ]);
@@ -130,10 +135,8 @@ class LPUserTraining extends Controller
     }
 
     public function updateTrainingJoinStatus(Request $request)
-    {
-
-        info("Nww Call");
-        info($request);
+     {
+      
         $validator = Validator::make($request->all(), [
             'slug' => 'required',
         ]);
@@ -156,7 +159,7 @@ class LPUserTraining extends Controller
                 //  $user->total_join = 1;
             } else {
                 if ($user && $request->is_start) {
-                   // $user->join_count = $user->join_count + 1;
+                    // $user->join_count = $user->join_count + 1;
                     $user->join_count = 1;
                 }
                 if ($user && $request->is_end) {
@@ -207,7 +210,7 @@ class LPUserTraining extends Controller
         }
     }
 
-    
+
     public function reActiveUserTraining(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -229,3 +232,39 @@ class LPUserTraining extends Controller
         }
     }
 }
+
+
+
+//$path = LPTraining::uploadFileGoogleCloudStorage($file);
+//      $googleConfigFile = file_get_contents(storage_path('credential.json'));  
+//       $user = Auth::user();
+//     //create a StorageClient object
+//             $storage = new StorageClient([
+//                 'keyFile' => json_decode($googleConfigFile, true)
+//             ]);
+
+//     //get the bucket name from the env file
+//             $storageBucketName = "educloudlab-storage";        
+//     //pass in the bucket name
+//             $bucket = $storage->bucket($storageBucketName);        
+//             $avatar_request = $request->file('file');        
+//             $image_path = $avatar_request->getRealPath();        
+//     //rename the file
+//             $avatar_name = $user->name.'-'.time().'.'.$avatar_request->extension();        
+//     //open the file using fopen
+//             $fileSource = fopen($image_path, 'r');        
+//     //specify the path to the folder and sub-folder where needed
+//             $googleCloudStoragePath = 'video/' . $avatar_name;               
+
+//             //Delete previously uploaded image to cloud storage by this user
+//             // if(Auth::user()->avatar !== ''){
+//             //     $object = $bucket->object('laravel-upload/'.Auth::user()->avatar );
+//             //     $object->delete();
+//             // };        
+
+//             //upload the new file to google cloud storage 
+//             $bucket->upload($fileSource, [
+//                 'predefinedAcl' => 'publicRead',
+//                 'name' => $googleCloudStoragePath
+//             ]);
+

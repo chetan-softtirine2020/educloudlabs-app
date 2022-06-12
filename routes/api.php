@@ -100,4 +100,22 @@ Route::middleware('auth:api')->group(function () {
     /**********************************END Learning Provider**********************************/
     //Admin 
 
+    //Course
+    Route::post('/create-course', 'API\Course\CourseController@createCourese');
+    Route::post('/get-course', 'API\Course\CourseController@getCourese');
+    Route::post('/update-course', 'API\Course\CourseController@updateCourese');
+    Route::post('/get-courses', 'API\Course\CourseController@getAllCoureses');
+    Route::post('/delete-course', 'API\Course\CourseController@deleteCourese');
+
+    // Moduls 
+    Route::post('/create-module', 'API\Course\ModulesController@createCoureseModule');
+    Route::post('/get-module', 'API\Course\ModulesController@getCoureseModule');
+    Route::post('/update-module', 'API\Course\ModulesController@updateCourseModule');
+    Route::post('/get-modules', 'API\Course\ModulesController@getAllCoureseModules');
+
+    // Topics
+    Route::post('/create-all-course', 'API\Course\TopicsController@createAllCoures');
+    
+    Route::post('/play-course-data', 'API\Course\CourseController@getCoursesForPlay');
+
 });
