@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class CourseController extends Controller
 {
@@ -40,7 +41,7 @@ class CourseController extends Controller
             $course->user_id = Auth::user()->id;
             $course->is_paid = 0;
             $course->save();
-            return response()->json(["message" => "Record Added Successfully."], 201);
+           return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -119,12 +120,11 @@ class CourseController extends Controller
             return response($validator->getMessageBag(), 422);
         }
         try {
-            //$course = Course::select('name', 'slug', 'id','description','amount')->where('user_id', Auth::user()->id)->where('status', Course::ACTIVE)->get();
             $course = Course::select('name','id','description','slug')->where('slug', $request->slug)->where('user_id', Auth::user()->id)->first();
-            $data = Modules::select('id', 'name', 'slug')->where('id', $course->id)->get();
+            $data = Modules::select('id', 'name', 'slug')->where('course_id', $course->id)->get();
             
             foreach ($data as $d) {
-                $topic = Topic::where('id', $d->id)->get();
+                $topic = Topic::where('module_id', $d->id)->get();                
                 $d['topic'] = $topic;                           
                }      
               $courseData['data']=$data;
@@ -134,10 +134,12 @@ class CourseController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
-
+    
+   
 
     public function deleteCourese(Request $request)
     {
+     //$result= DB::select("SELECT p.product_name, s.quntiy,s.date FROM stocks AS s JOIN product AS p ON s.product_id=p.id");     
+         
     }
 }

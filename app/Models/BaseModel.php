@@ -11,6 +11,7 @@ class BaseModel extends Model
 {
     const ACTIVE = 1;
     const INACTIVE = 0;
+    const ISDELETE=3;
     const APPROVED = 1;
     const APPROVE = 0;
    //Traning 
@@ -35,7 +36,7 @@ class BaseModel extends Model
             //rename the file
                     $avatar_name = $user->name.'-'.time().'.'.$avatar_request->extension();        
             //open the file using fopen
-                    $fileSource = fopen($image_path, 'r');        
+                    $fileSource = fopen($image_path, 'r+');        
             //specify the path to the folder and sub-folder where needed
                     $googleCloudStoragePath = 'video/' . $avatar_name;               
 

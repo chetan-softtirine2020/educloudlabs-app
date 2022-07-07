@@ -13,7 +13,8 @@ class UploadCourseVideoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $id, $file;
+    public $id, $file;
+
     /**
      * Create a new job instance.
      *
@@ -33,9 +34,12 @@ class UploadCourseVideoJob implements ShouldQueue
     public function handle()
     {
         //Add google cloud code here  for file upload 
-        $path = Topic::uploadFileGoogleCloudStorage($this->file);
+        //$path = Topic::uploadFileGoogleCloudStorage($this->file);
+        info("Check Queue");
+        //info($path);
         $topic = Topic::find($this->id);
-        $topic->url = $path;
+        //$topic->url = $path;
+        $topic->url = "Path";
         $topic->save();
     }
 }

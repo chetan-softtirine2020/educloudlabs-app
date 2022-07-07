@@ -37,7 +37,8 @@ class TopicsController extends Controller
             $topic->module_id = $request->module_id;
             $topic->url= Topic::uploadFileGoogleCloudStorage($file);
             $topic->save();
-            // dispatch(new UploadCourseVideoJob($topic->id, $file));
+            //dispatch(new UploadCourseVideoJob($topic->id, $file));
+            // UploadCourseVideoJob::dispatch($topic->id, "file");
             return response()->json(["message" => "Topic Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);

@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class TrainingController extends Controller
 {
@@ -23,10 +22,8 @@ class TrainingController extends Controller
 
     public function createTraining(Request $request)
     {
-          $disk=Storage::disk('gcs');
-          $disk->put('hola.txt',"hola text test");
 
-       
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'date' => 'required|date',
@@ -148,7 +145,7 @@ class TrainingController extends Controller
     public function allTrainings()
     {
         try {
-            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE  user_id=? ORDER BY id DESC", [Auth::user()->id]);
+            $trainings = DB::select("SELECT * FROM l_p_trainings WHERE  status!=? AND user_id=?  ORDER BY id DESC", [LPTraining::ISDELETE, Auth::user()->id]);
             $res['list'] = $trainings;
             // foreach ($trainings as $training) {
             //     $res['list'][] = [
@@ -200,7 +197,7 @@ class TrainingController extends Controller
         }
         try {
             $training = LPTraining::where('slug', $request->slug)->first();
-            $training->status = LPTraining::INACTIVE;
+            $training->status = LPTraining::ISDELETE;
             $training->save();
             LPTUser::where('training_id', $training->id)->update(['status' => LPTUser::INACTIVE]);
             return response()->json(['message' => "Record delete sucessfully"], 202);
