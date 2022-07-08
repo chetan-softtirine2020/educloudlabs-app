@@ -20,7 +20,7 @@ class OrganizationController extends Controller
     public function getAllOrganizations()
     {
         try {
-            $orgs = DB::select("SELECT * FROM organizations WHERE status=? AND is_approved=?", [Organization::ACTIVE, Organization::APPROVED]);
+            $orgs = DB::select("SELECT * FROM organizations WHERE is_approved=?", [Organization::APPROVED]);
             $res['list'] = [];
             foreach ($orgs as $org) {
                 $res['list'][] = [
@@ -28,6 +28,7 @@ class OrganizationController extends Controller
                     "email" => $org->email,
                     "description" => $org->description,
                     "id" => $org->id,
+                    'status'=>$org->status,
                     "is_approved" => $org->is_approved,
                 ];
             }
