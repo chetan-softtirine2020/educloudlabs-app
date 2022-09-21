@@ -4,11 +4,15 @@ namespace App\Http\Controllers\API\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
+use App\Models\BaseModel;
+use App\Models\Organization;
+use App\Models\OrgDetail;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends BaseController
 {
@@ -32,6 +36,7 @@ class AuthController extends BaseController
             return response($validator->getMessageBag(), 422);
         }
         try {
+            DB::beginTransaction();
             $user = new User();
             $user->first_name = $request->first_name;
             $user->last_name = $request->last_name;
@@ -39,13 +44,30 @@ class AuthController extends BaseController
             $user->email = $request->email;
             $user->mobile_no = $request->mobile_no;
             $user->password = bcrypt($request->password);
-            $user->role = $request->user_type;
-            if ($request->user_type == Role::LEARNING_PROVIDER || $request->user_type == Role::ORGANIZATION) {
+            $user->role = $request->user_type == 6 ? Role::ORG_SUB_ADMIN : $request->user_type;
+            if ($request->user_type == Role::LEARNING_PROVIDER) {
                 $user->is_parent = 1;
+                $user->parent_id =  Role::ADMIN;
+                $user->status = 0;
             }
-            if ($request->type == 6) {
-                $user->is_parent = $request->org_id;
+            if ($request->user_type == 6) {
+                $checkOrgUser = Organization::find($request->org_id);
+                $checkParentUser = User::where('email', $checkOrgUser->email)->first();
+                $user->is_parent = 1;
+                $user->parent_id = $checkParentUser->id;
+                $user->status = 0;
             }
+            $user->save();
+
+            if ($request->user_type == 6) {
+                $org = new OrgDetail();
+                $org->user_id = $user->id;
+                $org->org_id = $request->org_id;
+                $org->department_id = $request->lob_id;
+                $org->status = OrgDetail::INACTIVE;
+                $org->save();
+            }
+
             switch ($request->user_type) {
                 case Role::USER:
                     $role = "user";
@@ -53,11 +75,14 @@ class AuthController extends BaseController
                 case Role::LEARNING_PROVIDER:
                     $role = "provider";
                     break;
+                case Role::PROVIDER_USER:
+                    $role = "provider_user";
+                    break;
                 case Role::ORGANIZATION:
                     $role = "organization";
                     break;
-                case Role::PROVIDER_USER:
-                    $role = "provider_user";
+                case Role::ORG_SUB_ADMIN:
+                    $role = "organization_user";
                     break;
                 case Role::ORG_USER:
                     $role = "organization_user";
@@ -66,7 +91,7 @@ class AuthController extends BaseController
                     $role = "admin";
                     break;
             }
-           // $token = $user->createToken('MyApp')->accessToken;
+            // $token = $user->createToken('MyApp')->accessToken;
             $success['success'] = [
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
@@ -78,11 +103,12 @@ class AuthController extends BaseController
                 'role' => $role,
                 'token' => ""
             ];
-           // $user->is_login = 1;
-          //  $user->current_token = $token;
-            $user->save();
+            // $user->is_login = 1;
+            //  $user->current_token = $token;
+            DB::commit();
             return response()->json($success, 201);
         } catch (\Exception $e) {
+            DB::rollback();
             return response(['message' => $e->getMessage()], 500);
             //return response()->json();7
         }
@@ -108,6 +134,10 @@ class AuthController extends BaseController
         }
         try {
             $checkLoginUser = User::where('email', $request->email)->first();
+            // if account not approved by admin 
+            if ($checkLoginUser && $checkLoginUser->status == BaseModel::INACTIVE) {
+                return response()->json(['message' => "Your account not approved yet please contact to educloudlabs."], 403);
+            }
             if ($request->is_previous && $checkLoginUser) {
                 $checkLoginUser->is_login = 0;
                 $checkLoginUser->current_token = null;
@@ -121,7 +151,11 @@ class AuthController extends BaseController
                 $authenticated_user = Auth::user();
                 $user = User::find($authenticated_user->id);
                 $token = $user->createToken('myApp')->accessToken;
-                $role = Role::find($user->role);
+                if ($user->role == Role::ORG_SUB_ADMIN) {
+                    $role = Role::find(Role::ORGANIZATION);
+                } else {
+                    $role = Role::find($user->role);
+                }
                 $success['success'] = [
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,

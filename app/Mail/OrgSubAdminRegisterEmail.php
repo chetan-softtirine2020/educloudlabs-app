@@ -28,6 +28,6 @@ class OrgSubAdminRegisterEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Organization Admin Email')->markdown('emails.org_sub_admin_rgister_email')->with('details', $this->details);;
+        return $this->subject('Organization Admin Email')->markdown('emails.org_sub_admin_rgister_email')->with('details', $this->details);
     }
 }

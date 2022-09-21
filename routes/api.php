@@ -24,6 +24,10 @@ Route::post('/get-org-register', 'API\Organization\OrganizationController@getOrg
 //Landing Page
 Route::post('/get-home-trainings', 'API\Home\HomeController@allHomePageTrainings');
 
+
+Route::post('/add-line-of-business', 'API\Organization\DepartmentController@createDepartment');
+Route::post('/get-line-of-business', 'API\Organization\DepartmentController@getDepartments');
+
 Route::middleware('auth:api')->group(function () {
     //Common
     Route::post('/auth-details', 'API\UserController@authDetails');
@@ -37,7 +41,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/create-org-training', 'API\Organization\TrainingController@createOrgTraining');
     Route::post('/get-org-training', 'API\Organization\TrainingController@allOrgTrainings');
     //Route::post('/add-user-org-training', 'API\Organization\OrgTrainingUser@allOrgTrainings');
-    //Route::post('/get-user-org-training', 'API\Organization\OrgTrainingUser@allOrgTrainings');     
+    //Route::post('/get-user-org-training', 'API\Organization\OrgTrainingUser@allOrgTrainings'); 
+
 
     /********************************** End Organization **********************************/
 
@@ -50,9 +55,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/admin/get-users-list', 'API\Admin\UserController@getUserList');
     Route::post('/admin/get-child-users-list', 'API\Admin\UserController@getUserChildUser');
 
-    //Department
-    Route::post('/add-department', 'API\Organization\DepartmentController@createDepartment');
-    Route::post('/get-departments', 'API\Organization\DepartmentController@getDepartments');
+    Route::post('/admin/new-org-subadmin-request', 'API\Admin\UserController@getOrgRequestUser');
+    Route::post('/admin/update-org-subadmin-request', 'API\Admin\UserController@updateOrgRequestUser');
+
+    Route::post('/admin/new-learninig-provider-request', 'API\Admin\UserController@geLearningProviderRequest');
+    Route::post('/admin/update-learninig-provider-request', 'API\Admin\UserController@updateLearningProviderRequestUser');
 
     //Branch
     Route::post('/add-branch', 'API\Organization\BranchController@createBranch');
@@ -115,7 +122,23 @@ Route::middleware('auth:api')->group(function () {
 
     // Topics
     Route::post('/create-all-course', 'API\Course\TopicsController@createAllCoures');
-    
+    Route::post('/update-all-course', 'API\Course\TopicsController@updateAllCoures');
+
+    Route::post('/get-course-module-topic-list', 'API\Course\TopicsController@getCureseModuleTopicWiseList');
+    Route::post('/get-course-details', 'API\Course\TopicsController@getTopicEditData');
+
     Route::post('/play-course-data', 'API\Course\CourseController@getCoursesForPlay');
 
+    // Google Cloud Register
+    Route::post('/register-gc-account', 'API\GoogleCloud\GCPUserController@registerGCPUser');
+    Route::post('/gc-create-vm', 'API\GoogleCloud\GCPUserController@createVm');
+    Route::post('/vm-list', 'API\GoogleCloud\GCPUserController@getVmList');
+    Route::post('/authorize-gc-account', 'API\GoogleCloud\GCPUserController@authorizeGoogleAccount');
+    Route::post('/vm-start-stop', 'API\GoogleCloud\GCPUserController@vmStartAndStop');
+    Route::post('/vm-delete', 'API\GoogleCloud\GCPUserController@vmDelete');
+   
+    Route::post('/vm-assign-to-user', 'API\GoogleCloud\CGPVMController@importVMTrainingUser');
+    Route::post('/get-vm-count', 'API\GoogleCloud\CGPVMController@getVmCount');
+    Route::post('/vm-details', 'API\GoogleCloud\CGPVMController@getAssignVMDetails');
+ 
 });

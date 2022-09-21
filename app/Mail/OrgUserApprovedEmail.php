@@ -7,10 +7,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class AddTrainingMail extends Mailable
+class OrgUserApprovedEmail extends Mailable
 {
     use Queueable, SerializesModels;
-    protected $details;
+    public $details;
     /**
      * Create a new message instance.
      *
@@ -28,8 +28,6 @@ class AddTrainingMail extends Mailable
      */
     public function build()
     {
-        return $this->subject("Educloudlabs Training Invitation")->markdown('emails.addTrainingMail')->with('details', $this->details);
+        return $this->subject("Approved Educloudlabs Account")->markdown('emails.orgUserApproveEmail')->with('details', $this->details);
     }
 }
-
-

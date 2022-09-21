@@ -14,6 +14,9 @@ class BaseModel extends Model
     const ISDELETE=3;
     const APPROVED = 1;
     const APPROVE = 0;
+    const ACCEPT=1;
+    const REJECT=2; 
+      
    //Traning 
     const REGISTER=1;
     const START=2;

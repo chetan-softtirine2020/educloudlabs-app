@@ -26,7 +26,6 @@ class CreateOrgDetailsTable extends Migration
             $table->foreign('branch_id')->references('id')->on("branches")->onupdate("cascade");
             $table->foreign('department_id')->references('id')->on("departments")->onupdate("cascade");
             $table->foreign('section_id')->references('id')->on("sections")->onupdate("cascade");
-          
             $table->timestamps();
         });
     }

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class AddTrainingMail extends Mailable
+class VMTrainingInvitationMail extends Mailable
 {
     use Queueable, SerializesModels;
     protected $details;
@@ -28,8 +28,6 @@ class AddTrainingMail extends Mailable
      */
     public function build()
     {
-        return $this->subject("Educloudlabs Training Invitation")->markdown('emails.addTrainingMail')->with('details', $this->details);
+        return $this->subject("Educloudlabs Training VM Assign")->markdown('emails.vm_training_invitation')->with('details', $this->details);
     }
 }
-
-
