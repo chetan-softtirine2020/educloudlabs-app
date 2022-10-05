@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\LearningProvider\ProviderUser;
 
 use App\Http\Controllers\Controller;
 use App\Models\LPTUser;
+use App\Models\VMUsed;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,25 @@ class TrainingController extends Controller
             $training->is_join = 1;
             $training->save();
             return response()->json(["message" => "Record updated successfully "], 202);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
+        }
+    }
+
+    public function getLPUDashboarData(Request $request)
+    {
+        try {
+            $user_id = Auth::user()->id;
+            $vmData = VMUsed::select('v_m_details.vm_name', 'v_m_useds.created_at')->where('assign_user_id', $user_id)
+                ->join('v_m_details', 'v_m_useds.vm_id', '=', 'v_m_details.id')
+                ->where('v_m_useds.status', 1)
+                ->orderBy('v_m_useds.id', 'DESC')->first();
+
+               
+            $res = [];
+            $res['vm_data'] = $vmData;
+            $res['training_data'] = $vmData;
+            return response()->json($res, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
         }

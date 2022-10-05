@@ -17,10 +17,10 @@ class CreatePricingChartsTable extends Migration
             $table->id();
             $table->integer('memory');
             $table->integer('virtual_cpu')->nullable();
-            $table->float('linux');
-            $table->float('windows');
+            $table->float('linux')->nullable();
+            $table->float('windows')->nullable();
             $table->float('ubuntu')->nullable();
-            $table->float('debian');
+            $table->float('debian')->nullable();
             $table->float('storage_price')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();

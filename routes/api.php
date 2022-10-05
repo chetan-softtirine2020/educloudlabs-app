@@ -103,6 +103,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/lpu/get-trainings', 'API\LearningProvider\ProviderUser\TrainingController@getTrainingUsersWise');
     Route::post('/lpu/update-join-status', 'API\LearningProvider\ProviderUser\TrainingController@updateTrainingJoinStatus');
+    Route::post('/lpu/dashboard-data', 'API\LearningProvider\ProviderUser\TrainingController@getLPUDashboarData');
+
     //Add Learning Provider user 
     /**********************************END Learning Provider**********************************/
     //Admin 
@@ -136,9 +138,13 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/authorize-gc-account', 'API\GoogleCloud\GCPUserController@authorizeGoogleAccount');
     Route::post('/vm-start-stop', 'API\GoogleCloud\GCPUserController@vmStartAndStop');
     Route::post('/vm-delete', 'API\GoogleCloud\GCPUserController@vmDelete');
-   
+    Route::post('/check-gc-ac-exist', 'API\GoogleCloud\GCPUserController@checkUserGCAccoutExist');
+
     Route::post('/vm-assign-to-user', 'API\GoogleCloud\CGPVMController@importVMTrainingUser');
     Route::post('/get-vm-count', 'API\GoogleCloud\CGPVMController@getVmCount');
     Route::post('/vm-details', 'API\GoogleCloud\CGPVMController@getAssignVMDetails');
- 
+    Route::post('/vms-start-stop', 'API\GoogleCloud\GCPUserController@startStopMultipleVM');
+
+    Route::post('/get-pricing', 'API\GoogleCloud\CloudPriceController@getVMPricingChart');
+    Route::post('/update-pricing', 'API\GoogleCloud\CloudPriceController@updateVMPricing');
 });
