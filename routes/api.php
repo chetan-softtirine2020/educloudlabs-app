@@ -141,6 +141,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/check-gc-ac-exist', 'API\GoogleCloud\GCPUserController@checkUserGCAccoutExist');
 
     Route::post('/vm-assign-to-user', 'API\GoogleCloud\CGPVMController@importVMTrainingUser');
+    Route::post('/assign-vm-to-user', 'API\GoogleCloud\CGPVMController@addVMTrainingUser');
+
     Route::post('/get-vm-count', 'API\GoogleCloud\CGPVMController@getVmCount');
     Route::post('/vm-details', 'API\GoogleCloud\CGPVMController@getAssignVMDetails');
     Route::post('/vms-start-stop', 'API\GoogleCloud\GCPUserController@startStopMultipleVM');
