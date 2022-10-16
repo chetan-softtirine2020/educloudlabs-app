@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\GoogleCloud;
 
 use App\Http\Controllers\Controller;
+use App\Models\BaseModel;
 use App\Models\GCUser;
 use App\Models\PricingChart;
 use App\Models\VMDetails;
@@ -33,7 +34,7 @@ class GCPUserController extends Controller
           try {
                //Register user 
                $client = new \GuzzleHttp\Client();
-               $response = $client->request('POST', 'http://34.93.116.53/accounts/signup', [
+               $response = $client->request('POST', BaseModel::VMURL . '/accounts/signup', [
                     'form_params' => [
                          'username' => $request->username,
                          'password' => $request->password,
@@ -80,7 +81,7 @@ class GCPUserController extends Controller
                }
 
                $client = new \GuzzleHttp\Client();
-               $response = $client->request('POST', 'http://34.93.116.53/accounts/api/token/', [
+               $response = $client->request('POST', BaseModel::VMURL . '/accounts/api/token/', [
                     'form_params' => [
                          'username' => $request->username,
                          'password' => $request->password
@@ -134,7 +135,7 @@ class GCPUserController extends Controller
                $getToken = GCUser::where("user_id", Auth::user()->id)->orderBy('id', 'DESC')->first();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('POST', 'http://34.93.116.53/vm/', [
+                    $response = $client->request('POST', 'http://35.200.161.241/vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'image' => $request->image,
@@ -217,7 +218,7 @@ class GCPUserController extends Controller
                $token = $this->authorizeGcaccount();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('PATCH', 'http://34.93.116.53/vm/', [
+                    $response = $client->request('PATCH',  'http://35.200.161.241/vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'action' => $request->action,
@@ -277,7 +278,7 @@ class GCPUserController extends Controller
                $token = $this->authorizeGcaccount();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('PATCH', 'http://34.93.116.53/vm/', [
+                    $response = $client->request('PATCH',  'http://35.200.161.241/vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'action' => $request->action,
@@ -353,7 +354,7 @@ class GCPUserController extends Controller
                $user = GCUser::where('user_id', $user_id)->orderBy('id', 'desc')->first();
           }
           $client = new \GuzzleHttp\Client();
-          $response = $client->request('POST', 'http://34.93.116.53/accounts/api/token/', [
+          $response = $client->request('POST', 'http://35.200.161.241/accounts/api/token/', [
                'form_params' => [
                     'username' => $user->username,
                     'password' => $user->password

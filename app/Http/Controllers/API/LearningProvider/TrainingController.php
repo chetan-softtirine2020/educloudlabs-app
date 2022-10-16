@@ -25,12 +25,12 @@ class TrainingController extends Controller
 
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|regex:/^[\pL\s\-]+$/u',
             'date' => 'required|date',
             'description' => 'required',
             //'link' => 'required',
         ]);
-        if ($validator->fails()) {
+        if ($validator->fails()) {                                                                                  
             return response($validator->getMessageBag(), 422);
         }
         try {

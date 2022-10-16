@@ -246,4 +246,40 @@ class AuthController extends BaseController
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
+    public function sendOtp(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'mobile_no' => 'required|numeric|min:10',
+            ]
+        );
+        if ($validator->fails()) {
+            return response($validator->getMessageBag(), 422);
+        }
+        try {
+            $mobopt = random_int(100000, 999999);
+            $message = urlencode("Dear Customer, OTP is $mobopt for mobile no verify. EDUCLOUDLABS");
+          //  $message = urlencode("Dear Customer, OTP is $mobopt for panel creation. RNDSMS");
+            $authkey = "MWJlYjg4ZTFmZDF"; // Go to your Roundsms panel to get your authkey
+            $sender_id = "RNDSMS";
+            $type = 1;  //
+            $route = 2; //
+            $number =  $request->mobile_no;
+           // $number = 797730;
+            $send = "http://roundsms.com/api/sendhttp.php?authkey=" . $authkey . "&mobiles=" . $number . "&message=" . $message . "&sender=" . $sender_id . "&type=" . $type . "&route=" . $route;
+            $res = file_get_contents($send);
+            // if ($res) {
+            //     return $res;
+            // } else {
+            //     return false;
+            // }
+            //return response()->json(['opt' => json_encode($mobopt)], 200);
+            //info($mobopt);
+            return response()->json(['otp' => base64_encode($mobopt), 'res' => $res], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
 }

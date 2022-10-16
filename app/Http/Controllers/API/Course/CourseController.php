@@ -31,7 +31,7 @@ class CourseController extends Controller
         if ($validator->fails()) {
             return response($validator->getMessageBag(), 422);
         }
-        try {           
+        try {
             $checkCourseCount = Course::where('name', $request->name)->where('user_id', Auth::user()->id)->count();
             $course = new Course();
             $course->name = $request->name;
@@ -41,14 +41,14 @@ class CourseController extends Controller
             $course->user_id = Auth::user()->id;
             $course->is_paid = 0;
             $course->save();
-           return response()->json(["message" => "Record Added Successfully."], 201);
+            return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
 
-    
+
     public function getCourese(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -111,6 +111,8 @@ class CourseController extends Controller
     }
 
 
+
+
     public function getCoursesForPlay(Request $request)
     {
 
@@ -121,26 +123,35 @@ class CourseController extends Controller
             return response($validator->getMessageBag(), 422);
         }
         try {
-            $course = Course::select('name','id','description','slug')->where('slug', $request->slug)->where('user_id', Auth::user()->id)->first();
+            $course = Course::select('name', 'id', 'description', 'slug')->where('slug', $request->slug)->where('user_id', Auth::user()->id)->first();
             $data = Modules::select('id', 'name', 'slug')->where('course_id', $course->id)->get();
-            
+
             foreach ($data as $d) {
-                $topic = Topic::where('module_id', $d->id)->get();                
-                $d['topic'] = $topic;                           
-               }      
-              $courseData['data']=$data;
-              $courseData['course']=$course;   
+                $topic = Topic::where('module_id', $d->id)->get();
+                $d['topic'] = $topic;
+            }
+            $courseData['data'] = $data;
+            $courseData['course'] = $course;
             return response()->json($courseData, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    
-   
 
-    public function deleteCourese(Request $request)
+
+
+    // Get Courses 
+
+    public function getAllCouresesForUsers(Request $request)
     {
-     //$result= DB::select("SELECT p.product_name, s.quntiy,s.date FROM stocks AS s JOIN product AS p ON s.product_id=p.id");     
-         
+
+        try {
+            //  $course = Course::select('name', 'slug', 'id', 'description', 'amount')->where('status', Course::ACTIVE)->get();
+            $res = Course::latest()->with('modules')->with('topics')->get();
+            $res['list'] = $res;
+            return response()->json($res, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 }

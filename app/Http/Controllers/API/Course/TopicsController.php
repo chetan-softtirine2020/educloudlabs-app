@@ -56,7 +56,6 @@ class TopicsController extends Controller
             'description' => 'required',
             'module_id' => 'required',
             'topic_id' => 'required'
-
         ]);
         if ($validator->fails()) {
             return response($validator->getMessageBag(), 422);
@@ -116,27 +115,6 @@ class TopicsController extends Controller
         }
         try {
 
-            $username = "chetan";
-            $password = "Password@123";
-            $password2 = "Password@123";
-            $email = "chetan.softtrine@gmail.com";
-            $first_name = "Chetan";
-            $last_name = "Barde";
-            $client = new \GuzzleHttp\Client();
-            //http://34.93.116.53/vm/
-            $response = $client->request('POST', 'http://34.93.116.53/accounts/signup', [
-                'form_params' => [
-                    'username' => $username,
-                    'password' => $password,
-                    'password2' => $password2,
-                    'email' => $email,
-                    'first_name' => $first_name,
-                    'last_name' => $last_name
-                ]
-            ]);
-            $response = $response->getBody()->getContents();
-
-
             $topic = Topic::select('*')->where('slug', $request->slug)->first();
             $module = Modules::find($topic->module_id);
             $modules = Modules::select('name', 'slug', 'id')->where('course_id', $module->course_id)->where('status', Modules::ACTIVE)->get();
@@ -149,9 +127,26 @@ class TopicsController extends Controller
                 'module_id' => $topic->module_id,
                 'course_id' => $module->course_id,
                 'modules' => $modules,
-                'response' => $response
             ];
             return response()->json($res, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
+        }
+    }
+
+
+    public function deleteTopic(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response($validator->getMessageBag(), 422);
+        }
+        try {
+            Topic::where('slug', $request->slug)->delete();
+            return response()->json(['message' => 'Topic Deleted Sucessfully'], 202);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
         }

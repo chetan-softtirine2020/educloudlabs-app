@@ -16,11 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', 'API\Auth\AuthController@register');
 Route::post('/login', 'API\Auth\AuthController@login');
+
+Route::post('/otp', 'API\Auth\AuthController@sendOtp');
 Route::post('/forgot-password', 'API\Auth\ForgotPasswordController@forgotPassword');
 Route::post('/reset-password', 'API\Auth\ForgotPasswordController@resetPassword');
 Route::post('/create-organization', 'API\Organization\OrganizationController@createOrganization');
 Route::post('/get-org-register', 'API\Organization\OrganizationController@getOrganizationsForRegister');
 
+//Route::post('/send-otp', 'API\Auth\AuthController@handelSendOtp');
 //Landing Page
 Route::post('/get-home-trainings', 'API\Home\HomeController@allHomePageTrainings');
 
@@ -128,8 +131,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/get-course-module-topic-list', 'API\Course\TopicsController@getCureseModuleTopicWiseList');
     Route::post('/get-course-details', 'API\Course\TopicsController@getTopicEditData');
+    Route::post('/delete-topic', 'API\Course\TopicsController@deleteTopic');
 
     Route::post('/play-course-data', 'API\Course\CourseController@getCoursesForPlay');
+    Route::post('/course-list', 'API\Course\CourseController@getAllCouresesForUsers');
 
     // Google Cloud Register
     Route::post('/register-gc-account', 'API\GoogleCloud\GCPUserController@registerGCPUser');
@@ -149,4 +154,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/get-pricing', 'API\GoogleCloud\CloudPriceController@getVMPricingChart');
     Route::post('/update-pricing', 'API\GoogleCloud\CloudPriceController@updateVMPricing');
+
+    //Payment 
+    Route::post('/get-payment-details', 'API\Payment\PaymentController@getPaymentDetails');
+    Route::post('/vm-payment-data', 'API\Payment\PaymentController@getVMBillingDetails');
+    Route::post('/save-vm-payment-data', 'API\Payment\PaymentController@saveVmPaymenetDetails');
+    Route::post('/vm-payments-history', 'API\Payment\PaymentController@getLPVmPaymentHistory');
 });

@@ -22,6 +22,9 @@ class BaseModel extends Model
     const START=2;
     const COMPLETED=3;
 
+    const VMURL="http://35.200.161.241";
+
+
    public static function uploadFileGoogleCloudStorage($file){
              $googleConfigFile = file_get_contents(storage_path('credential.json'));  
               $user = Auth::user();
