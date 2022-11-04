@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\GCUser;
 use App\Models\PaymentHirstory;
 use App\Models\User;
+use App\Models\VMDetails;
 use App\Models\VmPaymentDetails;
 use App\Models\VMUsed;
 use Illuminate\Http\Request;
@@ -35,6 +37,8 @@ class PaymentController extends Controller
         //     return response($validator->getMessageBag(), 422);
         // }
         try {
+             $gcUser=GCUser::where('user_id',Auth::user()->id)->orderBy('id','DESC')->first();
+           // $result1=VMDetails::select('vm_name','storage','ram','total_cost','created')->where('user_id',$gcUser->id)->where('status',!= VMDetails::DELETE)->get();  
             $result = DB::select("SELECT vd.vm_name,u.first_name,u.last_name,vu.vm_start,vu.vm_stop,vu.used_min,vu.cost,vu.id FROM v_m_useds vu JOIN users u ON vu.assign_user_id=u.id JOIN v_m_details as vd ON vd.id=vu.vm_id WHERE vu.is_paid=? AND vu.assign_by=?", [0, Auth::user()->id]);
             $totalCost = DB::select("SELECT SUM(vu.cost) as cost FROM v_m_useds vu  WHERE vu.is_paid=? AND assign_by=?", [0, Auth::user()->id]);
             $user = User::select('email', 'mobile_no', 'first_name', 'last_name')->where('id', Auth::user()->id)->first();

@@ -268,7 +268,7 @@ class GCPUserController extends Controller
      {
           $validator = Validator::make($request->all(), [
                'action' => 'required|string|min:1',
-               'names.*' => 'required|string'
+               'name' => 'required|string'
           ]);
           if ($validator->fails()) {
                return response($validator->getMessageBag(), 422);
@@ -282,21 +282,18 @@ class GCPUserController extends Controller
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'action' => $request->action,
-                              'name' => ["caitlin-cleveland", "leonard-tatum"]
+                              'name' => $request->name
                          ]
                     ]);
                     $response = $response->getBody()->getContents();
-                    return $response;
-                    // $updateStopStart = VMDetails::where('vm_name', $request->name)->first();
-                    // $updateStopStart->status = $request->action == 'start' ? VMDetails::START : VMDetails::STOP;
-                    // $updateStopStart->save();
+                    $updateStopStart = VMDetails::where('vm_name', $request->name)->first();
+                    $updateStopStart->status = $request->action == 'start' ? VMDetails::START : VMDetails::STOP;
+                    $updateStopStart->save();
                }
           } catch (Exception $e) {
                return response()->json(['message' => $e->getMessage()]);
           }
      }
-
-
 
      public function vmDelete(Request $request)
      {
@@ -310,18 +307,32 @@ class GCPUserController extends Controller
                $token = $this->authorizeGcaccount();
                $getToken = GCUser::where("user_id", Auth::user()->id)->first();
                if ($token) {
-                    // $client = new \GuzzleHttp\Client();
-                    info([$request->name]);
-                    // $response = $client->request("DELETE", 'http://34.93.116.53/vm/', [
-                    //      'headers' => ['Authorization' => 'Bearer ' . $token],
-                    //      'form_params' => [
-                    //           'name' => [$request->name],
-                    //      ]
-                    // ]);
-                    // $response = $response->getBody()->getContents();
-                    // $updateStopStart = VMDetails::where('vm_name', $request->name)->first();
-                    // $updateStopStart->status = VMDetails::DELETE;
-                    // $updateStopStart->save();
+                    $client = new \GuzzleHttp\Client();
+                    $response = $client->request('DELETE', 'http://35.200.161.241/vm/', [
+                         'headers' => ['Authorization' => 'Bearer ' . $token],
+                         'form_params' => [
+                              'name' => $request->name,
+                         ]
+                    ]);
+                    $response = $response->getBody()->getContents();
+                    $vm = VMDetails::where('vm_name', $request->name)->first();
+                    $storage = PricingChart::where('storage_price', !NULL)->first();
+                    $vm->status = VMDetails::DELETE;
+                    $date = \Carbon\Carbon::now();
+                    $currentDate = $date->format('Y-m-d H:i:s');
+                    $to = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i',  $currentDate);
+                    $from = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i', $vm->created);
+                    $total_minutes = $to->diffInMinutes($from);
+                    $days = $from->diffInDays($to);
+                    $vm->deleted = $currentDate;
+                    $vm->used_min = $total_minutes / 60;
+                    $vm->vm_cost = $this->getTotalCost($total_minutes / 60, $vm);
+                    $storageCost = round($storage->storage_price * $vm->storage, 2);
+                    $month  = $this->getTotalMonth($days);
+                    $totalStorageCost = $storageCost * $month;
+                    $vm->storage_cost = $totalStorageCost;
+                    $vm->total_cost = $totalStorageCost + $vm->vm_cost;
+                    $vm->save();
                }
                return response()->json(["message" => "VM deleted sucessfully"], 202);
           } catch (Exception $e) {
@@ -377,5 +388,33 @@ class GCPUserController extends Controller
                $price = $getCost->linux;
           }
           return   $hr * $price;
+     }
+
+     public function getTotalMonth($days)
+     {
+          if ($days >= 1 && $days <= 30) {
+               $month = 1;
+          } else if ($days >= 31 && $days <= 60) {
+               $month = 2;
+          } else if ($days >= 61 && $days <= 90) {
+               $month = 3;
+          } else if ($days >= 91 && $days <= 120) {
+               $month = 4;
+          } else if ($days >= 121 && $days <= 150) {
+               $month = 5;
+          } else if ($days >= 151 && $days <= 180) {
+               $month = 6;
+          } else if ($days >= 181 && $days <= 210) {
+               $month = 7;
+          } else if ($days >= 211 && $days <= 240) {
+               $month = 8;
+          } else if ($days >= 241 && $days <= 270) {
+               $month = 9;
+          } else if ($days >= 271 && $days <= 300) {
+               $month = 10;
+          } else {
+               $month = 0;
+          }
+          return $month;
      }
 }

@@ -25,6 +25,7 @@ class VmPricingSeeder extends Seeder
         $price2->virtual_cpu = 2;
         $price2->linux = 0.05;
         $price2->windows = 0.2;
+        $price2->storage_price = 0.170;
         $price2->save();
 
 
@@ -33,6 +34,7 @@ class VmPricingSeeder extends Seeder
         $price3->virtual_cpu = 2;
         $price3->linux = 0.1;
         $price3->windows = 0.3;
+        $price3->storage_price = 0.170;
         $price3->save();
 
         $price4 = new PricingChart();
@@ -40,6 +42,7 @@ class VmPricingSeeder extends Seeder
         $price4->virtual_cpu = 4;
         $price4->linux = 0.2;
         $price4->windows = 0.6;
+        $price4->storage_price = 0.170;
         $price4->save();
 
         $price5 = new PricingChart();
@@ -47,6 +50,7 @@ class VmPricingSeeder extends Seeder
         $price5->virtual_cpu = 8;
         $price5->linux = 0.42;
         $price5->windows = 1.4;
+        $price5->storage_price = 0.170;
         $price5->save();
     }
 }

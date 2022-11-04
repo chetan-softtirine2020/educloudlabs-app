@@ -97,7 +97,8 @@ class CGPVMController extends Controller
             $assignVm->assign_by = Auth::user()->id;
             $assignVm->save();
             VMDetails::where('id', $vmDetails->id)->update(['is_assign' => 1]);
-            $link = "https://educloudlabs.com/vm/" . $vmDetails->vm_name;
+            $uiURL = config('app.ui_url');
+            $link = $uiURL . $vmDetails->vm_name;
             $otherText = !$checkUser ? "Use your register email and  default password for the login your account " . $password : " ";
             $description = "Login your details and use virtual machine for training";
             $details['user_name'] = $$request->first_name;
@@ -125,7 +126,4 @@ class CGPVMController extends Controller
             return response()->json(['message' => $e->getMessage()]);
         }
     }
-
-    
-
 }
