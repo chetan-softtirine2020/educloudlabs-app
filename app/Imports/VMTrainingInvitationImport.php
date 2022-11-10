@@ -52,6 +52,7 @@ class VMTrainingInvitationImport implements
                 $password = Str::random(8);
                 if (!$checkUser) {
                     $slug = User::userSlug($row["firstname"], $row["lastname"]);
+                    $codes = User::getUserCode(Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER, Auth::user()->id);
                     $user = User::create([
                         'first_name' => $row["firstname"],
                         'last_name' => $row["lastname"],
@@ -63,6 +64,8 @@ class VMTrainingInvitationImport implements
                         'role' => Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER
                     ]);
                     $user->slug = $slug;
+                    $user->name = $codes['code'];
+                    $user->parent_name = $codes['parent'];
                     $user->save();
                 }
                 //   $checkTraining = VMUsed::where('training_id', $this->training_id)->where('user_id', $checkUser ? $checkUser->id : $user->id)->first();

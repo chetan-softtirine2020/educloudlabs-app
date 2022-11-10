@@ -57,6 +57,9 @@ class AuthController extends BaseController
                 $user->parent_id = $checkParentUser->id;
                 $user->status = 0;
             }
+            $codes = User::getUserCode($request->user_type == 6 ? 7 : $request->user_type, $user->parent_id);
+            $user->name = $codes['code'];
+            $user->parent_name = $codes['parent'];
             $user->save();
 
             if ($request->user_type == 6) {
@@ -260,14 +263,14 @@ class AuthController extends BaseController
         }
         try {
             $mobopt = random_int(100000, 999999);
-            $message = urlencode("Dear Customer, OTP is $mobopt for mobile no verify. EDUCLOUDLABS");
-          //  $message = urlencode("Dear Customer, OTP is $mobopt for panel creation. RNDSMS");
+            //$message = urlencode("Dear Customer, OTP is $mobopt for mobile no verify. EDUCLOUDLABS");
+            $message = urlencode("Dear Customer, OTP is $mobopt for panel creation. RNDSMS");
             $authkey = "MWJlYjg4ZTFmZDF"; // Go to your Roundsms panel to get your authkey
             $sender_id = "RNDSMS";
             $type = 1;  //
             $route = 2; //
             $number =  $request->mobile_no;
-           // $number = 797730;
+            // $number = 797730;
             $send = "http://roundsms.com/api/sendhttp.php?authkey=" . $authkey . "&mobiles=" . $number . "&message=" . $message . "&sender=" . $sender_id . "&type=" . $type . "&route=" . $route;
             $res = file_get_contents($send);
             // if ($res) {

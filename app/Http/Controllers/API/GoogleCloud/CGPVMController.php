@@ -89,6 +89,9 @@ class CGPVMController extends Controller
                     'role' => Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER
                 ]);
                 $user->slug = $slug;
+                $codes = User::getUserCode(Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER, Auth::user()->id);
+                $user->name = $codes['code'];
+                $user->parent_name = $codes['parent'];
                 $user->save();
             }
             $assignVm = new VMUsed();

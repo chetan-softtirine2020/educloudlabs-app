@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BaseModel;
 use App\Models\GCUser;
 use App\Models\PricingChart;
+use App\Models\User;
 use App\Models\VMDetails;
 use App\Models\VMUsed;
 use Illuminate\Http\Request;
@@ -149,9 +150,12 @@ class GCPUserController extends Controller
                     ]);
                     $response = $response->getBody()->getContents();
                     $res = json_decode($response, true);
-
                     if ($res) {
                          for ($i = 0; $i < $request->count; $i++) {
+                              $parentUser = User::find(Auth::user()->id);
+                              $getCount = VMDetails::where('user_id', $getToken->id)->count();
+                              $number = sprintf('%05d', $getCount + 1);
+                              $name = $parentUser->name . "VM" . $number;
                               $vmDetails = new VMDetails();
                               $vmDetails->user_id = $getToken->id;
                               $vmDetails->image = $request->image;
@@ -161,6 +165,7 @@ class GCPUserController extends Controller
                               $vmDetails->ram = $request->ram;
                               $vmDetails->softwares = $request->softwares;
                               $vmDetails->vm_name = $res[$i];
+                              $vmDetails->name = $name;
                               $vmDetails->save();
                          }
                     }

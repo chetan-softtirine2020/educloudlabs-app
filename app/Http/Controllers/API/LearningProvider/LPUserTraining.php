@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\API\LearningProvider;
 
 use App\Http\Controllers\Controller;
-use App\Imports\LPUsersImport;
 use App\Imports\TrainingUser;
-use App\Imports\TrainingUsersImport;
-use App\Imports\UsersImport;
 use Illuminate\Http\Request;
 use Exception;
 use App\Models\User;
@@ -17,15 +14,10 @@ use App\Models\LPTraining;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Mail\AddTrainingMail;
 use App\Models\TrainingInfo;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Google\Cloud\Storage\StorageClient;
+use Illuminate\Support\Facades\Hash;
+
 //use Storage;
 
 class LPUserTraining extends Controller
@@ -46,20 +38,23 @@ class LPUserTraining extends Controller
             $user = User::where('email', $request->email)->first();
             $password = Str::random(8);
             if (!$user) {
-                $user = new User();
-                $user->first_name = $request->first_name;
-                $user->last_name = $request->last_name;
-                $user->email = $request->email;
-                $user->slug = User::userSlug($request->first_name, $request->last_name);
-                $user->mobile_no = $request->mobile_no;
-                $user->parent_id = Auth::user()->id;
-                $user->password = bcrypt($password);
-                $user->role = Role::PROVIDER_USER;
-                $user->save();
+                $codes = User::getUserCode(Role::PROVIDER_USER, Auth::user()->id);
+                $user1 = new User();
+                $user1->first_name = $request->first_name;
+                $user1->last_name = $request->last_name;
+                $user1->email = $request->email;
+                $user1->slug = User::userSlug($request->first_name, $request->last_name);
+                $user1->mobile_no = $request->mobile_no;
+                $user1->parent_id = Auth::user()->id;
+                $user1->password = Hash::make($password);
+                $user1->role = Role::PROVIDER_USER;
+                $user1->name = $codes['code'];
+                $user1->parent_name = $codes['parent'];
+                $user1->save();
             }
             $training = LPTraining::where('slug', $request->slug)->first();
             $lptuser = new LPTUser();
-            $lptuser->user_id = $user->id;
+            $lptuser->user_id = $user ? $user->id : $user1->id;
             $lptuser->training_id = $training->id;
             $lptuser->provider_id = Auth::user()->id;
             $lptuser->save();
@@ -73,7 +68,7 @@ class LPUserTraining extends Controller
             $details['link'] = $link;
             $details['description'] = $description . " " . $otherText;
             //Mail::to($user->email)->send(new AddTrainingMail($training));
-            dispatch(new AddLPTrainingUserJob($details, $user->email));
+            dispatch(new AddLPTrainingUserJob($details,  $user ? $user->email : $user1->email));
             return response()->json(["message" => "Record Added Successfully."], 201);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
@@ -135,8 +130,8 @@ class LPUserTraining extends Controller
     }
 
     public function updateTrainingJoinStatus(Request $request)
-     {
-      
+    {
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required',
         ]);
@@ -267,4 +262,3 @@ class LPUserTraining extends Controller
 //                 'predefinedAcl' => 'publicRead',
 //                 'name' => $googleCloudStoragePath
 //             ]);
-

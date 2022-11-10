@@ -28,7 +28,7 @@ class OrganizationController extends Controller
                     "email" => $org->email,
                     "description" => $org->description,
                     "id" => $org->id,
-                    'status'=>$org->status,
+                    'status' => $org->status,
                     "is_approved" => $org->is_approved,
                 ];
             }
@@ -98,17 +98,20 @@ class OrganizationController extends Controller
             $org->is_approved = $request->is_approved;
             $org->save();
             if ($request->is_approved == 1) {
+                $password = Str::random(8);
+                $codes = User::getUserCode(Role::ORGANIZATION, 1);
                 $user = new User();
                 $user->first_name = $org->name;
-                $user->last_name = $org->name;        
+                $user->last_name = $org->name;
                 $user->slug = Str::slug($org->name);
                 $user->email = $org->email;
                 $user->mobile_no = $org->mobile_no;
-                $user->password = bcrypt("Password@123");
-                $user->role = Role::ORGANIZATION;  
+                $user->password = bcrypt($password);
+                $user->role = Role::ORGANIZATION;
+                $user->name = $codes['code'];
                 $user->save();
                 //Send Approved Email Data 
-                $details['message'] = "Your organization register request has been approved please login your register email and default password is"." ".Str::random(8);
+                $details['message'] = "Your organization register request has been approved please login your account register email and default password is" . " " . $password;
             } else {
                 //Send Not Approved Email Data 
                 $details['message'] = "Your organization register request  not approved so  contact to Educloudlabs admin on admin@educloudlabs.com";

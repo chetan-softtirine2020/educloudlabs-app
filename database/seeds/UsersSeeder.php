@@ -36,8 +36,6 @@ class UsersSeeder extends Seeder
         $user->save();
 
 
-
-
         $userlp1 = new User();
         $userlp1->first_name = "DemoLP1";
         $userlp1->last_name = "Provider";

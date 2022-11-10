@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Str;
+use App\Models\Role;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -44,5 +45,52 @@ class User extends Authenticatable implements MustVerifyEmail
         $userCount = self::where('first_name', $first)->where('last_name', $last)->count();
         $userCount > 0 ? $count = $userCount : $count = "";
         return  Str::slug($first . " " . $last . "" . $count);
+    }
+
+
+    public static function getUserCode($role, $parentId)
+    {
+        $getCount = User::where('role', $role)->count();
+        $getTotalUser = User::where('parent_id', $parentId)->count();
+        $parentUser = User::find($parentId);
+        $code = "";
+        $parentCode = NULL;
+        switch ($role) {
+            case Role::LEARNING_PROVIDER:
+                $number = sprintf('%05d', $getCount + 1);
+                $code = "LP" . $number;
+                break;
+
+            case Role::USER:
+                $number = sprintf('%05d', $getCount + 1);
+                $code = "USR" . $number;
+                break;
+
+            case Role::ORG_SUB_ADMIN:
+                $number = sprintf('%05d', $getTotalUser + 1);
+                $code = $parentUser->name . "LP" . $number;
+                $parentCode = $parentUser->name;
+                break;
+
+            case Role::PROVIDER_USER:
+                $number = sprintf('%05d', $getTotalUser + 1);
+                $code = $parentUser->name . "USR" . $number;
+                $parentCode = $parentUser->name;
+                break;
+
+            case Role::ORGANIZATION:
+                $number = sprintf('%05d', $getCount + 1);
+                $code = "ORG" . $number;
+                break;
+
+            case Role::ORG_USER:
+                $number = sprintf('%05d', $getTotalUser + 1);
+                $code = $parentUser->name . "USR" . $number;
+                $parentCode = $parentUser->name;
+                break;
+            default:
+                break;
+        }
+        return  ['code' => $code, 'parent' => $parentCode];
     }
 }

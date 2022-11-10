@@ -121,7 +121,7 @@ class UserController extends Controller
                 $user->status = 2;
                 $msg = "Request is not accepted";
                 //Send Email IN Active 
-                $details['message'] = "Your Educloudlabs request is rejected.";
+                $details['message'] = "Your Educloudlabs account request is rejected.";
             }
             $user->save();
             dispatch(new SendOrgUserRequestStatusJob($details, $user->email));

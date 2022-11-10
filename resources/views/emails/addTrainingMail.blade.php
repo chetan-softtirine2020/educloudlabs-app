@@ -1,6 +1,6 @@
 @component('mail::message')
     Hi, {{ $details['user_name'] }},<br>
-    I would like to invite you to attend a training on Educloudlabs.
+    I would like to you invite  attend a training on Educloudlabs.
     {{ $details['description'] }}
     @component('mail::button', ['url' => $details['link']])
         Join

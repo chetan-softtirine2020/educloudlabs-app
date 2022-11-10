@@ -59,4 +59,5 @@ class BaseModel extends Model
             return $path="https://storage.googleapis.com/educloudlab-storage/".$googleCloudStoragePath;
            
         }
+
 }

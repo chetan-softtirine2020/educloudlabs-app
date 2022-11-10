@@ -43,11 +43,12 @@ class TrainingUser implements
      */
     public function collection(Collection $rows)
     {
-      
+
         foreach ($rows as $row) {
             $checkUser = User::where('email', $row['email'])->first();
             $password = Str::random(8);
             if (!$checkUser) {
+                $codes = User::getUserCode(Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER, Auth::user()->id);
                 $slug = User::userSlug($row["firstname"], $row["lastname"]);
                 $user = User::create([
                     'first_name' => $row["firstname"],
@@ -60,6 +61,8 @@ class TrainingUser implements
                     'role' => Auth::user()->role == Role::LEARNING_PROVIDER ? Role::PROVIDER_USER : Role::ORG_USER
                 ]);
                 $user->slug = $slug;
+                $user->name = $codes['code'];
+                $user->parent_name = $codes['parent'];
                 $user->save();
             }
             $checkTraining = LPTUser::where('training_id', $this->training_id)->where('user_id', $checkUser ? $checkUser->id : $user->id)->first();
