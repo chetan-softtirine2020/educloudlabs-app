@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         try {
 
-            $users = DB::select("SELECT first_name,last_name,email,mobile_no,id,slug FROM  users WHERE role=? AND status=?", [$request->role, $request->type]);
+            $users = DB::select("SELECT first_name,last_name,email,mobile_no,id,slug,name as uname FROM  users WHERE role=? AND status=?", [$request->role, $request->type]);
             $res['list'] = $users;
             return response()->json($res, 200);
         } catch (Exception $e) {
@@ -30,7 +30,7 @@ class UserController extends Controller
     {
         try {
             $user = User::where('slug', $request->slug)->first();
-            $users = DB::select('SELECT first_name,last_name,email,mobile_no,id,slug FROM users WHERE parent_id=?', [$user->id]);
+            $users = DB::select('SELECT first_name,last_name,name,email,mobile_no,id,slug FROM users WHERE parent_id=?', [$user->id]);
             $res['list'] = $users;
             return response()->json($res, 200);
         } catch (Exception $e) {
@@ -42,7 +42,7 @@ class UserController extends Controller
     public function getOrgRequestUser(Request $request)
     {
         try {
-            $users = DB::select("SELECT u.id AS usid,u.email,u.first_name,u.last_name,o.name As oname,d.name as lob, od.id as odid 
+            $users = DB::select("SELECT u.id AS usid, u.name as uname,u.email,u.first_name,u.last_name,o.name As oname,d.name as lob, od.id as odid 
         FROM org_details AS od 
         JOIN users As u ON u.id=od.user_id 
         JOIN departments As d ON d.id=od.department_id 

@@ -35,7 +35,7 @@ class GCPUserController extends Controller
           try {
                //Register user 
                $client = new \GuzzleHttp\Client();
-               $response = $client->request('POST', BaseModel::VMURL . '/accounts/signup', [
+               $response = $client->request('POST', BaseModel::VMURL . 'accounts/signup', [
                     'form_params' => [
                          'username' => $request->username,
                          'password' => $request->password,
@@ -76,13 +76,12 @@ class GCPUserController extends Controller
           try {
 
                $checkGcuser = GCUser::where('username', $request->username)->where('password', $request->password)->first();
-               info($checkGcuser);
                if (!$checkGcuser) {
                     return response()->json(['message' => "No active account found with the given credentials"], 403);
                }
 
                $client = new \GuzzleHttp\Client();
-               $response = $client->request('POST', BaseModel::VMURL . '/accounts/api/token/', [
+               $response = $client->request('POST', BaseModel::VMURL . 'accounts/api/token/', [
                     'form_params' => [
                          'username' => $request->username,
                          'password' => $request->password
@@ -136,7 +135,7 @@ class GCPUserController extends Controller
                $getToken = GCUser::where("user_id", Auth::user()->id)->orderBy('id', 'DESC')->first();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('POST', 'http://35.200.161.241/vm/', [
+                    $response = $client->request('POST',   BaseModel::VMURL . 'vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'image' => $request->image,
@@ -184,7 +183,7 @@ class GCPUserController extends Controller
                $vmUser = GCUser::where('user_id', Auth::user()->id)->orderBy('id', 'DESC')->first();
                $vms = [];
                if ($vmUser) {
-                    $vms = DB::select("SELECT vm_name,status,image,ram,storage,id,protocol,created,zone FROM v_m_details WHERE user_id=?", [$vmUser->id]);
+                    $vms = DB::select("SELECT vm_name,status,image,ram,storage,id,protocol,created,zone,name FROM v_m_details WHERE user_id=?", [$vmUser->id]);
                }
                $res['list'] = $vms;
                return response()->json($res, 200);
@@ -223,7 +222,7 @@ class GCPUserController extends Controller
                $token = $this->authorizeGcaccount();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('PATCH',  'http://35.200.161.241/vm/', [
+                    $response = $client->request('PATCH',  BaseModel::VMURL . 'vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'action' => $request->action,
@@ -283,7 +282,7 @@ class GCPUserController extends Controller
                $token = $this->authorizeGcaccount();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('PATCH',  'http://35.200.161.241/vm/', [
+                    $response = $client->request('PATCH',  BaseModel::VMURL . 'vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
                               'action' => $request->action,
@@ -310,31 +309,43 @@ class GCPUserController extends Controller
           }
           try {
                $token = $this->authorizeGcaccount();
-               $getToken = GCUser::where("user_id", Auth::user()->id)->first();
                if ($token) {
                     $client = new \GuzzleHttp\Client();
-                    $response = $client->request('DELETE', 'http://35.200.161.241/vm/', [
+                    $response = $client->request('DELETE', BaseModel::VMURL . 'vm/', [
                          'headers' => ['Authorization' => 'Bearer ' . $token],
                          'form_params' => [
-                              'name' => $request->name,
+                              'name' => [$request->name],
                          ]
                     ]);
+
+                    info($request->name);
                     $response = $response->getBody()->getContents();
                     $vm = VMDetails::where('vm_name', $request->name)->first();
-                    $storage = PricingChart::where('storage_price', !NULL)->first();
+                    info("VM=" . $vm);
+                    $storage = PricingChart::whereNotNull('storage_price')->first();
+                    info("Storage" . $storage);
                     $vm->status = VMDetails::DELETE;
                     $date = \Carbon\Carbon::now();
-                    $currentDate = $date->format('Y-m-d H:i:s');
-                    $to = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i',  $currentDate);
+                    $to = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i',  $date);
                     $from = \Carbon\Carbon::createFromFormat('Y-m-d H:s:i', $vm->created);
                     $total_minutes = $to->diffInMinutes($from);
+                    info("Current Date=" . $to);
+                    info("From Date=" . $from);
+                    info("total minu=" . $total_minutes);
                     $days = $from->diffInDays($to);
-                    $vm->deleted = $currentDate;
+                    $vm->deleted = $to;
                     $vm->used_min = $total_minutes / 60;
                     $vm->vm_cost = $this->getTotalCost($total_minutes / 60, $vm);
+                    info("S Price=" . $storage->storage_price);
                     $storageCost = round($storage->storage_price * $vm->storage, 2);
+                    info("StorageCost=" . $storageCost);
+
                     $month  = $this->getTotalMonth($days);
+                    info("days=".$days);
+                    info("Month=".$month);
+                    info("StorageCost=" . $storageCost);
                     $totalStorageCost = $storageCost * $month;
+                    info("TOtalStorageCost=" . $totalStorageCost);
                     $vm->storage_cost = $totalStorageCost;
                     $vm->total_cost = $totalStorageCost + $vm->vm_cost;
                     $vm->save();
@@ -370,7 +381,7 @@ class GCPUserController extends Controller
                $user = GCUser::where('user_id', $user_id)->orderBy('id', 'desc')->first();
           }
           $client = new \GuzzleHttp\Client();
-          $response = $client->request('POST', 'http://35.200.161.241/accounts/api/token/', [
+          $response = $client->request('POST', BaseModel::VMURL . 'accounts/api/token/', [
                'form_params' => [
                     'username' => $user->username,
                     'password' => $user->password
