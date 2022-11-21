@@ -19,7 +19,8 @@ class CreateLPTrainingsTable extends Migration
             $table->string('slug');
             $table->string('description')->nullable();
             $table->string('link');
-            $table->dateTime('date');
+            $table->timestamp('start_date');
+            $table->timestamp('end_date')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->boolean('status')->default(1);
             $table->boolean('is_paid')->default(0);

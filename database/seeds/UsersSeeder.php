@@ -61,7 +61,8 @@ class UsersSeeder extends Seeder
         $training1 = new LPTraining();
         $training1->name = 'Python (Basic)';
         $training1->slug = Str::slug('Python (Basic)');
-        $training1->date = date('Y-m-d h:i:s');
+        $training1->start_date = date('Y-m-d h:i:s');
+        $training1->end_date = date('Y-m-d h:i:s');
         $training1->link =  'Python (Basic)';
         $training1->description = "This Python basic training imporve basic skill using this training";
         $training1->user_id = $userlp1->id;
@@ -72,7 +73,8 @@ class UsersSeeder extends Seeder
         $training2 = new LPTraining();
         $training2->name = 'Python (Intermediate)';
         $training2->slug = Str::slug('Python (Intermediate)');
-        $training2->date = date('Y-m-d h:i:s');
+        $training2->start_date = date('Y-m-d h:i:s');
+        $training2->end_date = date('Y-m-d h:i:s');
         $training2->link =  'Python (Intermediate)';
         $training2->description = "This Python Intermediate training imporve basic skill using this training";
         $training2->user_id = $userlp1->id;
@@ -83,7 +85,8 @@ class UsersSeeder extends Seeder
         $training3 = new LPTraining();
         $training3->name = 'Python (Advance)';
         $training3->slug = Str::slug('Python (Advance)');
-        $training3->date = date('Y-m-d h:i:s');
+        $training3->start_date = date('Y-m-d h:i:s');
+        $training3->end_date = date('Y-m-d h:i:s');
         $training3->link =  'Python (Advance)';
         $training3->description = "This Python Advance training imporve basic skill using this training";
         $training3->user_id = $userlp1->id;
@@ -95,7 +98,8 @@ class UsersSeeder extends Seeder
         $training4 = new LPTraining();
         $training4->name = 'C Programining (Basic)';
         $training4->slug = Str::slug('Python (Basic)');
-        $training4->date = date('Y-m-d h:i:s');
+        $training4->start_date = date('Y-m-d h:i:s');
+        $training4->end_date = date('Y-m-d h:i:s');
         $training4->link =  'C Programining (Basic)';
         $training4->description = "This C Programining Basic training imporve basic skill using this training";
         $training4->user_id = $userlp2->id;
@@ -106,7 +110,8 @@ class UsersSeeder extends Seeder
         $training5 = new LPTraining();
         $training5->name = 'C Programining (Advance)';
         $training5->slug = Str::slug('Python (Advance)');
-        $training5->date = date('Y-m-d h:i:s');
+        $training5->start_date = date('Y-m-d h:i:s');
+        $training5->end_date = date('Y-m-d h:i:s');
         $training5->link =  'Python (Advance)';
         $training5->description = "This C Programining Advance training imporve basic skill using this training";
         $training5->user_id = $userlp2->id;

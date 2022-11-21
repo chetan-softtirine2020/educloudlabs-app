@@ -25,8 +25,9 @@ class TrainingController extends Controller
 
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|regex:/^[\pL\s\-]+$/u',
-            'date' => 'required|date',
+            'name' => 'required',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
             'description' => 'required',
             //'link' => 'required',
         ]);
@@ -37,7 +38,8 @@ class TrainingController extends Controller
             $training = new LPTraining();
             $training->name = $request->name;
             $training->slug = Str::slug($request->name);
-            $training->date = date('Y-m-d h:i:s', strtotime($request->date));
+            $training->start_date = date('Y-m-d h:i:s', strtotime($request->date));
+            $training->end_date = date('Y-m-d h:i:s', strtotime($request->date));
             $training->link =  $request->name;
             $training->description = $request->description;
             $training->user_id = Auth::user()->id;
@@ -130,7 +132,8 @@ class TrainingController extends Controller
             $training = LPTraining::find($request->id);
             $training->name = $request->name;
             $training->slug = Str::slug($request->name);
-            $training->date = $request->date;
+            $training->start_date = $request->date;
+            $training->end_date = $request->date;
             $training->link = $request->link;
             $training->is_paid = 1;
             $training->description = $request->description;
